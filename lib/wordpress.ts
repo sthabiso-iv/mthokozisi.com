@@ -122,16 +122,21 @@ export function stripHtml(html: string): string {
     .trim();
 }
 
+/** Decode HTML entities in an embedded term's name */
+function decodeTerm<T extends WPTerm>(term: T): T {
+  return { ...term, name: stripHtml(term.name) };
+}
+
 /** Get tags from a post's embedded terms */
 export function getTags(post: WPPost): WPTerm[] {
   const terms = post._embedded?.["wp:term"] ?? [];
-  return terms.flat().filter((t) => t.taxonomy === "post_tag");
+  return terms.flat().filter((t) => t.taxonomy === "post_tag").map(decodeTerm);
 }
 
 /** Get primary category from a post's embedded terms */
 export function getPrimaryCategory(post: WPPost): WPTerm | null {
   const terms = post._embedded?.["wp:term"] ?? [];
-  const categories = terms.flat().filter((t) => t.taxonomy === "category");
+  const categories = terms.flat().filter((t) => t.taxonomy === "category").map(decodeTerm);
   return categories.find((c) => c.slug !== "uncategorized") ?? categories[0] ?? null;
 }
 

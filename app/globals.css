@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Root variables ──────────────────────────────────────────── */
+:root {
+  --yellow: #f5c518;
+  --yellow-hover: #ffd700;
+  --dark: #0d0d0d;
+  --dark-100: #111111;
+  --dark-200: #161616;
+  --dark-300: #1c1c1c;
+  --dark-400: #242424;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #606060;
+}
+
+/* ── Base resets ──────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor targets so fixed nav doesn't cover them */
+  scroll-padding-top: 80px;
+}
+
+body {
+  background-color: #0d0d0d;
+  color: #f0f0f0;
+  font-family: var(--font-inter), "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Selection colour ─────────────────────────────────────────── */
+::selection {
+  background-color: rgba(245, 197, 24, 0.25);
+  color: #f5c518;
+}
+
+/* ── Tactical grid background utility ───────────────────────── */
+.bg-tactical {
+  background-image:
+    linear-gradient(rgba(245, 197, 24, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 197, 24, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── Yellow accent text ──────────────────────────────────────── */
+.text-yellow {
+  color: #f5c518;
+}
+
+/* ── Section label (e.g. "// 01 - ABOUT") ───────────────────── */
+.section-label {
+  font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f5c518;
+}
+
+/* ── Section heading ─────────────────────────────────────────── */
+.section-heading {
+  font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  color: #f0f0f0;
+}
+
+/* ── Yellow divider line ─────────────────────────────────────── */
+.yellow-line {
+  display: block;
+  width: 48px;
+  height: 3px;
+  background-color: #f5c518;
+}
+
+/* ── Pill tag ────────────────────────────────────────────────── */
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background-color: rgba(245, 197, 24, 0.08);
+  color: #f5c518;
+  border: 1px solid rgba(245, 197, 24, 0.2);
+  border-radius: 2px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f5c518;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #f5c518;
+  outline-offset: 3px;
+}
+
+/* ── WordPress post content (rendered HTML from WP REST API) ── */
+/* Applied via className="wp-content" on the post content wrapper */
+.wp-content {
+  color: #a0a0a0;
+  font-family: var(--font-inter), "DM Sans", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+
+.wp-content h1,
+.wp-content h2,
+.wp-content h3,
+.wp-content h4,
+.wp-content h5,
+.wp-content h6 {
+  font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f5c518;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.15;
+}
+
+.wp-content h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+.wp-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.wp-content h3 { font-size: clamp(1.25rem, 2.5vw, 1.6rem); }
+.wp-content h4 { font-size: 1.2rem; }
+
+.wp-content p {
+  margin-bottom: 1.4rem;
+}
+
+.wp-content a {
+  color: #f5c518;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+.wp-content a:hover { color: #ffd700; }
+
+.wp-content strong { color: #f0f0f0; font-weight: 600; }
+.wp-content em     { font-style: italic; }
+
+.wp-content ul,
+.wp-content ol {
+  margin-bottom: 1.4rem;
+  padding-left: 1.5rem;
+}
+.wp-content ul { list-style-type: square; }
+.wp-content ol { list-style-type: decimal; }
+.wp-content li { margin-bottom: 0.4rem; }
+
+.wp-content blockquote {
+  border-left: 2px solid #f5c518;
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  color: #f0f0f0;
+  font-style: italic;
+}
+
+.wp-content pre,
+.wp-content code {
+  font-family: "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.875rem;
+  background: #161616;
+  border: 1px solid #242424;
+}
+.wp-content code {
+  padding: 0.1em 0.4em;
+  border-radius: 2px;
+  color: #f5c518;
+}
+.wp-content pre {
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin-bottom: 1.4rem;
+  color: #f0f0f0;
+  line-height: 1.6;
+}
+.wp-content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.wp-content img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #242424;
+  margin: 1.5rem 0;
+}
+
+.wp-content hr {
+  border: none;
+  border-top: 1px solid #1c1c1c;
+  margin: 2.5rem 0;
+}
+
+.wp-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.4rem;
+  font-size: 0.9rem;
+}
+.wp-content th {
+  background: #161616;
+  color: #f5c518;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 1rem;
+  border: 1px solid #242424;
+  text-align: left;
+}
+.wp-content td {
+  padding: 0.6rem 1rem;
+  border: 1px solid #1c1c1c;
+}

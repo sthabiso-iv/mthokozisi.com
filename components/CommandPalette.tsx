@@ -189,10 +189,18 @@ interface WPSearchPost {
 }
 
 function stripHtml(html: string) {
-  return html.replace(/<[^>]+>/g, "").replace(/&[a-z]+;/g, (e) => {
-    const map: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#039;": "'", "&apos;": "'" };
-    return map[e] ?? e;
-  });
+  return html
+    .replace(/<[^>]+>/g, "")
+    // Named entities
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, " ")
+    .replace(/&hellip;/g, "…").replace(/&mdash;/g, "—").replace(/&ndash;/g, "–")
+    .replace(/&lsquo;/g, "\u2018").replace(/&rsquo;/g, "\u2019")
+    .replace(/&ldquo;/g, "\u201C").replace(/&rdquo;/g, "\u201D")
+    // Decimal numeric entities (e.g. &#8217; &#8220;)
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    // Hex numeric entities (e.g. &#x2019;)
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 }
 
 // ── Main component ────────────────────────────────────────────────────────────

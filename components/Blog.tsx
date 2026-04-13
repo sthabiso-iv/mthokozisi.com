@@ -101,7 +101,7 @@ export default async function Blog() {
 
       <div className="max-w-6xl mx-auto px-6">
         <AnimatedSection>
-          <p className="section-label mb-3">// 04 - Writing</p>
+          <p className="section-label mb-3">// 05 - Writing</p>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-16">
             <h2 className="section-heading text-[clamp(2.5rem,6vw,4rem)]">
               Writing

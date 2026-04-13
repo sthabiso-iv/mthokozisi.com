@@ -58,7 +58,7 @@ export default function Contact() {
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <AnimatedSection>
-          <p className="section-label mb-3">// 05 - Contact</p>
+          <p className="section-label mb-3">// 06 - Contact</p>
           <h2 className="section-heading text-[clamp(2.5rem,6vw,4rem)] mb-4">
             Let&apos;s talk
           </h2>

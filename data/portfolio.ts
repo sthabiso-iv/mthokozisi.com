@@ -112,6 +112,115 @@ export const projects: Project[] = [
   },
 ];
 
+// ── Experience ────────────────────────────────────────────────
+export interface ExperienceEntry {
+  company: string;
+  url: string;
+  role: string;
+  period: string;
+  location: string;
+  bullets: string[];
+  tags: string[];
+}
+
+export const experience: ExperienceEntry[] = [
+  {
+    company: "The Delta",
+    url: "https://thedelta.io",
+    role: "Junior Software Engineer",
+    period: "Oct 2024 - Present",
+    location: "Johannesburg, South Africa",
+    bullets: [
+      "Building mobile applications for client ventures using Flutter and FlutterFlow",
+      "Working across the full development lifecycle - from scoping to deployment",
+      "Collaborating with founders to translate business requirements into working software",
+      "Contributing to internal AI research and agent tooling initiatives",
+    ],
+    tags: ["Flutter", "FlutterFlow", "React", "TypeScript", "Supabase"],
+  },
+  {
+    company: "The Delta",
+    url: "https://thedelta.io",
+    role: "Associate Software Engineer",
+    period: "Jul 2024 - Sep 2024",
+    location: "South Africa",
+    bullets: [
+      "Onboarded into the engineering team, shipping features across active client projects",
+      "Ramped up on the internal tooling stack and established working patterns with the team",
+    ],
+    tags: ["Flutter", "TypeScript", "React"],
+  },
+  {
+    company: "UniApplyForMe",
+    url: "https://apply.org.za",
+    role: "Co-Founder & CTO",
+    period: "May 2021 - Dec 2024",
+    location: "Johannesburg, South Africa",
+    bullets: [
+      "Built and scaled the platform from scratch - website, mobile app (Flutter, Android), brand identity, and full server infrastructure",
+      "Designed and implemented the UniApplyForMe brand - colours, logo, and visual identity still in use today",
+      "Set up and managed dedicated hosting infrastructure: LiteSpeed, CloudLinux, cPanel, AlmaLinux",
+      "Built chatbot automation across WhatsApp, Instagram and Facebook using SendPulse and Twilio",
+      "Grew organic traffic through SEO strategy - resulting in R100K+ in AdSense revenue since September 2024",
+      "Integrated Google Workspace with WordPress via OIDC for single sign-on across the platform",
+    ],
+    tags: ["Flutter", "WordPress", "PHP", "n8n", "SendPulse", "Twilio", "Yoast SEO", "Google Cloud", "AWS SES", "Cloudflare"],
+  },
+  {
+    company: "UniApplyForMe",
+    url: "https://apply.org.za",
+    role: "Chairperson of the Board",
+    period: "Dec 2024 - Present",
+    location: "Johannesburg, South Africa",
+    bullets: [
+      "Transitioned from CTO to Chairperson, overseeing strategic direction and partnerships",
+      "Guiding the organisation's long-term vision for education access in South Africa",
+      "Maintaining technical oversight while empowering the team to own day-to-day operations",
+    ],
+    tags: ["Strategy", "EdTech", "Nonprofit"],
+  },
+  {
+    company: "DesignThat Cloud",
+    url: "https://designthat.cloud",
+    role: "Cloud Support Engineer",
+    period: "Jan 2022 - Aug 2024",
+    location: "South Africa",
+    bullets: [
+      "Set up and managed dedicated servers and VPS instances for client websites",
+      "Handled full cPanel, WHMCS, DNS, SSL, and firewall management",
+      "Built and maintained client websites and digital presence across WordPress, WooCommerce, and custom stacks",
+      "Managed shared hosting environments and server-level optimisation (LiteSpeed, CloudLinux)",
+    ],
+    tags: ["cPanel", "WHMCS", "WordPress", "LiteSpeed", "CloudLinux", "DNS", "AlmaLinux"],
+  },
+  {
+    company: "Lithemba Funeral Cover",
+    url: "/",
+    role: "Full-stack Developer",
+    period: "Nov 2020 - Present",
+    location: "Pretoria, South Africa",
+    bullets: [
+      "Built the company website from the ground up and have maintained it continuously since founding",
+      "Implemented CMS, forms, and client-facing tooling to support the business operations",
+      "Ongoing maintenance, performance optimisation, and feature development as the business grows",
+    ],
+    tags: ["WordPress", "PHP", "Elementor", "ACF"],
+  },
+  {
+    company: "North-West University",
+    url: "https://nwu.ac.za",
+    role: "Graphic Designer & Media Specialist",
+    period: "Sep 2022 - Sep 2023",
+    location: "Mahikeng, South Africa",
+    bullets: [
+      "Created visual content for the NWU Mascot Team - banners, flyers, social media graphics and event promotions",
+      "Produced and edited video content with transitions, effects and soundtracks",
+      "Developed augmented reality filters for fan engagement across social platforms",
+    ],
+    tags: ["Canva", "Adobe Illustrator", "Video Editing", "AR Filters"],
+  },
+];
+
 // ── Skills ────────────────────────────────────────────────────
 export interface SkillGroup {
   label: string;
@@ -185,6 +294,7 @@ export const contact = {
 export const navLinks = [
   { label: "About", href: "#about" },
   { label: "Work", href: "#projects" },
+  { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
   { label: "Writing", href: "#blog" },
   { label: "Contact", href: "#contact" },

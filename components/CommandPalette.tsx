@@ -464,13 +464,17 @@ export default function CommandPalette() {
             onKeyDown={handlePanelKeyDown}
           >
             {/* ── Input row ────────────────────────────────────────────── */}
-            <div className="relative flex items-center px-4 border-b border-[#1c1c1c]">
-              {/* Search icon */}
+            <div
+              className="relative flex items-center px-4"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              {/* Search icon — stays muted at all times */}
               <svg
                 width="18" height="18"
-                viewBox="0 0 24 24" fill="none" stroke="#606060"
+                viewBox="0 0 24 24" fill="none"
+                stroke="rgba(255,255,255,0.3)"
                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                className="flex-shrink-0"
+                className="flex-shrink-0 pointer-events-none"
                 aria-hidden="true"
               >
                 <circle cx="11" cy="11" r="8" />
@@ -487,8 +491,8 @@ export default function CommandPalette() {
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
-                className="flex-1 bg-transparent border-none outline-none px-3 py-4 text-[18px] text-[#f0f0f0] placeholder-[#444] font-body"
-                style={{ caretColor: "#f5c518" }}
+                className="flex-1 bg-transparent border-0 outline-none ring-0 px-3 py-4 text-[18px] text-[#f0f0f0] placeholder-[#444] font-body focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none"
+                style={{ caretColor: "#f5c518", boxShadow: "none" }}
                 aria-label="Search"
                 aria-autocomplete="list"
                 aria-controls="palette-results"

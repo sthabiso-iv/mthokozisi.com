@@ -121,25 +121,26 @@ export default function Nav() {
           Hire me
         </a>
 
-        {/* Mobile search icon */}
-        <button
-          onClick={openPalette}
-          aria-label="Search"
-          className="md:hidden p-2 text-[#606060] hover:text-[#f5c518] transition-colors duration-200"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-        </button>
+        {/* Mobile right-side controls — grouped so justify-between doesn't spread them */}
+        <div className="flex items-center gap-1 md:hidden">
+          <button
+            onClick={openPalette}
+            aria-label="Search"
+            className="p-2 text-[#606060] hover:text-[#f5c518] transition-colors duration-200"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden flex flex-col gap-[5px] p-2 group"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-        >
+          {/* Mobile hamburger */}
+          <button
+            className="flex flex-col gap-[5px] p-2 group"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+          >
           <span
             className={`block w-6 h-[2px] bg-[#f0f0f0] transition-all duration-300 origin-center ${
               mobileOpen ? "rotate-45 translate-y-[7px]" : ""
@@ -155,7 +156,8 @@ export default function Nav() {
               mobileOpen ? "-rotate-45 -translate-y-[7px]" : ""
             }`}
           />
-        </button>
+          </button>
+        </div>{/* end mobile right-side controls */}
       </nav>
 
       {/* Mobile menu dropdown */}

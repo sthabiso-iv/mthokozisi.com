@@ -52,6 +52,24 @@ export interface PostsPage {
 
 // ── Helpers ───────────────────────────────────────────────────
 
+/**
+ * Strip the featured image from post content.
+ * WordPress sometimes injects the featured image at the top of
+ * content.rendered — this removes it so it's only shown via the
+ * deliberately-rendered <Image> component (OG + post header only).
+ */
+export function stripFeaturedImage(content: string, featuredImageUrl?: string): string {
+  if (!featuredImageUrl) return content;
+  const escaped = featuredImageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const imgPattern = new RegExp(
+    `<img[^>]*src=["'][^"']*${escaped}[^"']*["'][^>]*>`,
+    "gi"
+  );
+  return content
+    .replace(imgPattern, "")
+    .replace(/<figure[^>]*>\s*<\/figure>/gi, "");
+}
+
 /** Strip HTML tags and decode entities — safe for meta descriptions */
 export function stripHtml(html: string): string {
   return html
@@ -136,8 +154,9 @@ export async function getPosts(options: {
   page?: number;
   perPage?: number;
   categoryId?: number;
+  revalidate?: number;
 }): Promise<PostsPage> {
-  const { page = 1, perPage = 12, categoryId } = options;
+  const { page = 1, perPage = 12, categoryId, revalidate = 3600 } = options;
 
   const params = new URLSearchParams({
     _embed: "1",
@@ -149,7 +168,7 @@ export async function getPosts(options: {
   if (categoryId) params.set("categories", String(categoryId));
 
   const res = await fetch(`${WP_API}/posts?${params.toString()}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate },
   });
 
   if (!res.ok) {
@@ -165,9 +184,9 @@ export async function getPosts(options: {
   return { posts, total, totalPages };
 }
 
-/** Fetch N most recent posts (used for homepage preview) */
+/** Fetch N most recent posts (used for homepage preview) — short cache TTL */
 export async function getRecentPosts(count = 3): Promise<WPPost[]> {
-  const { posts } = await getPosts({ page: 1, perPage: count });
+  const { posts } = await getPosts({ page: 1, perPage: count, revalidate: 300 });
   return posts;
 }
 

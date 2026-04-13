@@ -11,7 +11,7 @@ import { getPosts, getCategories } from "@/lib/wordpress";
 import PostsGrid from "@/components/PostsGrid";
 import { meta } from "@/data/portfolio";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Writing",

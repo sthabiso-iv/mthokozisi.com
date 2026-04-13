@@ -1,3 +1,7 @@
+// Revalidate the homepage every 5 minutes so the blog preview
+// never shows content older than 5 minutes.
+export const revalidate = 300;
+
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Stats from "@/components/Stats";

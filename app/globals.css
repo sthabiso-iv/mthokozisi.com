@@ -121,20 +121,20 @@ body {
 }
 
 /* ── WordPress post content (rendered HTML from WP REST API) ── */
-/* Applied via className="wp-content" on the post content wrapper */
-.wp-content {
+/* Applied via className="prose-content" on the post content wrapper */
+.prose-content {
   color: #a0a0a0;
   font-family: var(--font-inter), "DM Sans", system-ui, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.8;
 }
 
-.wp-content h1,
-.wp-content h2,
-.wp-content h3,
-.wp-content h4,
-.wp-content h5,
-.wp-content h6 {
+.prose-content h1,
+.prose-content h2,
+.prose-content h3,
+.prose-content h4,
+.prose-content h5,
+.prose-content h6 {
   font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -145,36 +145,36 @@ body {
   line-height: 1.15;
 }
 
-.wp-content h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
-.wp-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
-.wp-content h3 { font-size: clamp(1.25rem, 2.5vw, 1.6rem); }
-.wp-content h4 { font-size: 1.2rem; }
+.prose-content h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+.prose-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.prose-content h3 { font-size: clamp(1.25rem, 2.5vw, 1.6rem); }
+.prose-content h4 { font-size: 1.2rem; }
 
-.wp-content p {
+.prose-content p {
   margin-bottom: 1.4rem;
 }
 
-.wp-content a {
+.prose-content a {
   color: #f5c518;
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.2s;
 }
-.wp-content a:hover { color: #ffd700; }
+.prose-content a:hover { color: #ffd700; }
 
-.wp-content strong { color: #f0f0f0; font-weight: 600; }
-.wp-content em     { font-style: italic; }
+.prose-content strong { color: #f0f0f0; font-weight: 600; }
+.prose-content em     { font-style: italic; }
 
-.wp-content ul,
-.wp-content ol {
+.prose-content ul,
+.prose-content ol {
   margin-bottom: 1.4rem;
   padding-left: 1.5rem;
 }
-.wp-content ul { list-style-type: square; }
-.wp-content ol { list-style-type: decimal; }
-.wp-content li { margin-bottom: 0.4rem; }
+.prose-content ul { list-style-type: square; }
+.prose-content ol { list-style-type: decimal; }
+.prose-content li { margin-bottom: 0.4rem; }
 
-.wp-content blockquote {
+.prose-content blockquote {
   border-left: 2px solid #f5c518;
   padding-left: 1.25rem;
   margin: 2rem 0;
@@ -182,52 +182,67 @@ body {
   font-style: italic;
 }
 
-.wp-content pre,
-.wp-content code {
+.prose-content pre,
+.prose-content code {
   font-family: "Fira Code", "Cascadia Code", monospace;
   font-size: 0.875rem;
   background: #161616;
   border: 1px solid #242424;
 }
-.wp-content code {
+.prose-content code {
   padding: 0.1em 0.4em;
   border-radius: 2px;
   color: #f5c518;
 }
-.wp-content pre {
+.prose-content pre {
   padding: 1.25rem 1.5rem;
   overflow-x: auto;
   margin-bottom: 1.4rem;
   color: #f0f0f0;
   line-height: 1.6;
 }
-.wp-content pre code {
+.prose-content pre code {
   background: transparent;
   border: none;
   padding: 0;
   color: inherit;
 }
 
-.wp-content img {
+.prose-content img {
+  width: 100%;
   max-width: 100%;
   height: auto;
-  border: 1px solid #242424;
-  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 197, 24, 0.15);
+  margin: 2rem auto;
+  display: block;
 }
 
-.wp-content hr {
+.prose-content figure {
+  margin: 2rem 0;
+}
+
+.prose-content figcaption {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.prose-content hr {
   border: none;
   border-top: 1px solid #1c1c1c;
   margin: 2.5rem 0;
 }
 
-.wp-content table {
+.prose-content table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1.4rem;
   font-size: 0.9rem;
 }
-.wp-content th {
+.prose-content th {
   background: #161616;
   color: #f5c518;
   font-family: var(--font-rajdhani), sans-serif;
@@ -238,7 +253,7 @@ body {
   border: 1px solid #242424;
   text-align: left;
 }
-.wp-content td {
+.prose-content td {
   padding: 0.6rem 1rem;
   border: 1px solid #1c1c1c;
 }

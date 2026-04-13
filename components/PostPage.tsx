@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 import {
   getPrimaryCategory,
   getFeaturedImageUrl,
+  stripFeaturedImage,
   formatDate,
   stripHtml,
   type WPPost,
@@ -24,10 +25,18 @@ interface PostPageProps {
 export default function PostPage({ post }: PostPageProps) {
   if (!post) notFound();
 
-  const category  = getPrimaryCategory(post);
-  const imageUrl  = getFeaturedImageUrl(post);
+  const category    = getPrimaryCategory(post);
+  const imageUrl    = getFeaturedImageUrl(post);
   const featuredAlt = post._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ?? post.title.rendered;
   const plainTitle  = stripHtml(post.title.rendered);
+
+  // Strip the featured image from content — WP sometimes injects it at the
+  // top of content.rendered. We render it deliberately above, OG only.
+  const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+  const cleanContent = stripFeaturedImage(
+    post.content.rendered,
+    rawSourceUrl ?? imageUrl ?? undefined
+  );
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">
@@ -85,8 +94,8 @@ export default function PostPage({ post }: PostPageProps) {
 
         {/* ── Post content ───────────────────────────────────── */}
         <div
-          className="wp-content"
-          dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+          className="prose-content"
+          dangerouslySetInnerHTML={{ __html: cleanContent }}
         />
 
         {/* ── Share buttons ───────────────────────────────────── */}

@@ -57,17 +57,44 @@ export interface PostsPage {
  * WordPress sometimes injects the featured image at the top of
  * content.rendered — this removes it so it's only shown via the
  * deliberately-rendered <Image> component (OG + post header only).
+ *
+ * Matches all WP size variants of the image (e.g. -1024x576, -scaled)
+ * by extracting the base filename stem from the URL.
  */
 export function stripFeaturedImage(content: string, featuredImageUrl?: string): string {
-  if (!featuredImageUrl) return content;
-  const escaped = featuredImageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const imgPattern = new RegExp(
-    `<img[^>]*src=["'][^"']*${escaped}[^"']*["'][^>]*>`,
-    "gi"
-  );
-  return content
-    .replace(imgPattern, "")
+  if (!featuredImageUrl || !content) return content;
+
+  // Derive base filename stem so we match all WP-generated size variants.
+  // e.g. "https://blog.../wp-content/uploads/2024/01/my-img-1024x576.jpg?v=1"
+  //   → stem = "my-img"
+  const pathNoQuery = featuredImageUrl.split("?")[0];
+  const filename    = pathNoQuery.split("/").pop() ?? "";
+  // Strip WP size suffix (-WxH) and extension to get the stem
+  const stem = filename.replace(/-\d+x\d+(\.[a-z]+)$/i, "$1").replace(/\.[a-z]+$/i, "");
+
+  let result = content;
+
+  if (stem) {
+    const escapedStem = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Remove <figure> blocks that contain this image (any size variant)
+    result = result.replace(
+      new RegExp(`<figure[^>]*>[\\s\\S]*?${escapedStem}[^<]*[\\s\\S]*?</figure>`, "gi"),
+      ""
+    );
+    // Remove bare <img> tags matching this stem
+    result = result.replace(
+      new RegExp(`<img[^>]*${escapedStem}[^>]*>`, "gi"),
+      ""
+    );
+  }
+
+  // Also try exact URL match as fallback (covers cases where stem extraction failed)
+  const escapedUrl = featuredImageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  result = result
+    .replace(new RegExp(`<img[^>]*src=["'][^"']*${escapedUrl}[^"']*["'][^>]*>`, "gi"), "")
     .replace(/<figure[^>]*>\s*<\/figure>/gi, "");
+
+  return result;
 }
 
 /** Strip HTML tags and decode entities — safe for meta descriptions */
@@ -130,11 +157,14 @@ export async function getCategories(): Promise<WPTerm[]> {
   try {
     const res = await fetch(
       `${WP_API}/categories?per_page=100&hide_empty=true`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
     const cats = (await res.json()) as WPTerm[];
-    return cats.filter((c) => c.slug !== "uncategorized");
+    return cats
+      .filter((c) => c.slug !== "uncategorized")
+      // Decode HTML entities in category names (WP returns "Foo &amp; Bar" etc.)
+      .map((c) => ({ ...c, name: stripHtml(c.name) }));
   } catch {
     return [];
   }
@@ -142,8 +172,25 @@ export async function getCategories(): Promise<WPTerm[]> {
 
 /** Find a single category by slug, or null */
 export async function getCategoryBySlug(slug: string): Promise<WPTerm | null> {
+  // Check the cached category list first
   const categories = await getCategories();
-  return categories.find((c) => c.slug === slug) ?? null;
+  const found = categories.find((c) => c.slug === slug) ?? null;
+  if (found) return found;
+
+  // Not in the cached list — do a direct API lookup so newly-created
+  // categories are found even before the cache refreshes.
+  try {
+    const res = await fetch(
+      `${WP_API}/categories?slug=${encodeURIComponent(slug)}&hide_empty=true`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) return null;
+    const cats = (await res.json()) as WPTerm[];
+    const cat = cats[0] ?? null;
+    return cat ? { ...cat, name: stripHtml(cat.name) } : null;
+  } catch {
+    return null;
+  }
 }
 
 /**

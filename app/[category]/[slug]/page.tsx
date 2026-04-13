@@ -20,7 +20,7 @@ import {
 import { meta as siteMeta } from "@/data/portfolio";
 import PostPage from "@/components/PostPage";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs();

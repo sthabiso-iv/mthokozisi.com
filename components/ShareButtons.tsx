@@ -2,11 +2,12 @@
 
 /**
  * ShareButtons
- * Share a blog post via X, LinkedIn, WhatsApp, and copy-link.
- * Uses the current page URL from window.location.
+ * Share a blog post via X, LinkedIn, Facebook, WhatsApp, and copy-link.
+ * Social links use <a target="_blank"> for maximum browser compatibility
+ * (avoids popup-blocker interference with window.open).
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ShareButtonsProps {
   title: string;
@@ -24,6 +25,14 @@ function LinkedInIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
     </svg>
   );
 }
@@ -46,55 +55,31 @@ function LinkIcon() {
 }
 
 export default function ShareButtons({ title }: ShareButtonsProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied]     = useState(false);
+  const [pageUrl, setPageUrl]   = useState("");
 
-  const getUrl = () =>
-    typeof window !== "undefined" ? window.location.href : "";
+  // Capture the URL after hydration so it's available for all share links
+  useEffect(() => {
+    setPageUrl(window.location.href);
+  }, []);
+
+  const encodedUrl   = encodeURIComponent(pageUrl);
+  const encodedTitle = encodeURIComponent(title);
 
   const handleCopy = async () => {
+    if (!pageUrl) return;
     try {
-      await navigator.clipboard.writeText(getUrl());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(pageUrl);
     } catch {
-      // Fallback for older browsers
       const input = document.createElement("input");
-      input.value = getUrl();
+      input.value = pageUrl;
       document.body.appendChild(input);
       input.select();
       document.execCommand("copy");
       document.body.removeChild(input);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
-  };
-
-  const shareX = () => {
-    const text = encodeURIComponent(title);
-    const url  = encodeURIComponent(getUrl());
-    window.open(
-      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-      "_blank",
-      "noopener,noreferrer,width=550,height=420"
-    );
-  };
-
-  const shareLinkedIn = () => {
-    const url = encodeURIComponent(getUrl());
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-      "_blank",
-      "noopener,noreferrer,width=600,height=520"
-    );
-  };
-
-  const shareWhatsApp = () => {
-    const text = encodeURIComponent(`${title} ${getUrl()}`);
-    window.open(
-      `https://api.whatsapp.com/send?text=${text}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const btnBase =
@@ -104,18 +89,51 @@ export default function ShareButtons({ title }: ShareButtonsProps) {
     <div className="mt-12 pt-8 border-t border-[#1c1c1c]">
       <p className="section-label mb-4">// Share</p>
       <div className="flex flex-wrap gap-3">
-        <button onClick={shareX} className={btnBase} aria-label="Share on X">
+
+        <a
+          href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btnBase}
+          aria-label="Share on X"
+        >
           <XIcon />
           X
-        </button>
-        <button onClick={shareLinkedIn} className={btnBase} aria-label="Share on LinkedIn">
+        </a>
+
+        <a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btnBase}
+          aria-label="Share on LinkedIn"
+        >
           <LinkedInIcon />
           LinkedIn
-        </button>
-        <button onClick={shareWhatsApp} className={btnBase} aria-label="Share on WhatsApp">
+        </a>
+
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btnBase}
+          aria-label="Share on Facebook"
+        >
+          <FacebookIcon />
+          Facebook
+        </a>
+
+        <a
+          href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={btnBase}
+          aria-label="Share on WhatsApp"
+        >
           <WhatsAppIcon />
           WhatsApp
-        </button>
+        </a>
+
         <button
           onClick={handleCopy}
           className={`${btnBase} ${copied ? "border-[#f5c518] text-[#f5c518]" : ""}`}
@@ -124,6 +142,7 @@ export default function ShareButtons({ title }: ShareButtonsProps) {
           <LinkIcon />
           {copied ? "Copied!" : "Copy link"}
         </button>
+
       </div>
     </div>
   );

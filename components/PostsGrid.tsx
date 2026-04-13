@@ -159,9 +159,19 @@ export default function PostsGrid({ initialPosts, total, categorySlug }: PostsGr
     );
   }
 
+  // Limit columns to the total number of posts so the grid background
+  // never bleeds through empty cells when there are fewer than 3 posts.
+  const maxCols   = Math.min(total, 3);
+  const colClass  =
+    maxCols === 1
+      ? "grid-cols-1"
+      : maxCols === 2
+      ? "grid-cols-1 sm:grid-cols-2"
+      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#1c1c1c]">
+      <div className={`grid ${colClass} gap-px bg-[#1c1c1c]`}>
         {posts.map((post) => (
           <div key={post.id} className="bg-[#0d0d0d]">
             <PostCard post={post} />

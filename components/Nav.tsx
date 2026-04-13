@@ -13,10 +13,12 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, meta } from "@/data/portfolio";
+import { useCommandPalette } from "@/hooks/useCommandPalette";
 
 export default function Nav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { open: openPalette } = useCommandPalette();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -92,6 +94,21 @@ export default function Nav() {
           ))}
         </ul>
 
+        {/* Search button */}
+        <button
+          onClick={openPalette}
+          aria-label="Search (Cmd+K)"
+          className="hidden md:flex items-center gap-2 text-[#606060] hover:text-[#f5c518] transition-colors duration-200 group"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <span className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-body font-500 text-[#444] border border-[#2a2a2a] group-hover:border-[#f5c518]/40 group-hover:text-[#f5c518] transition-all duration-200">
+            ⌘K
+          </span>
+        </button>
+
         {/* Desktop CTA */}
         <a
           href="#contact"
@@ -103,6 +120,18 @@ export default function Nav() {
         >
           Hire me
         </a>
+
+        {/* Mobile search icon */}
+        <button
+          onClick={openPalette}
+          aria-label="Search"
+          className="md:hidden p-2 text-[#606060] hover:text-[#f5c518] transition-colors duration-200"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
 
         {/* Mobile hamburger */}
         <button

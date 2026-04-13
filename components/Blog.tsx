@@ -30,7 +30,7 @@ function PostCard({ post }: { post: WPPost }) {
       <div className="flex items-center gap-3 mb-3">
         {category && (
           <Link
-            href={`/posts?cat=${category.slug}`}
+            href={`/posts/${category.slug}`}
             className="pill text-[0.65rem] hover:bg-[#f5c518]/20 transition-colors duration-150"
           >
             {category.name}

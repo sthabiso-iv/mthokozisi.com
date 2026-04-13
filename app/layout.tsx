@@ -7,6 +7,8 @@ import "./globals.css";
 import { meta, contact } from "@/data/portfolio";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { CommandPaletteProvider } from "@/hooks/useCommandPalette";
+import CommandPalette from "@/components/CommandPalette";
 
 // ── Fonts ─────────────────────────────────────────────────────
 const inter = Inter({
@@ -117,9 +119,12 @@ export default function RootLayout({
         className="bg-dark text-text-primary font-body antialiased"
         suppressHydrationWarning
       >
-        <Nav />
-        {children}
-        <Footer />
+        <CommandPaletteProvider>
+          <Nav />
+          {children}
+          <Footer />
+          <CommandPalette />
+        </CommandPaletteProvider>
         <Analytics />
       </body>
     </html>

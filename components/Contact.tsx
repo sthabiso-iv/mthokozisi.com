@@ -18,12 +18,13 @@ interface FormState {
   email: string;
   subject: string;
   message: string;
+  website: string; // honeypot - never shown to users
 }
 
 type SubmitStatus = "idle" | "loading" | "success" | "error";
 
 export default function Contact() {
-  const [form, setForm] = useState<FormState>({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState<FormState>({ name: "", email: "", subject: "", message: "", website: "" });
   const [status, setStatus] = useState<SubmitStatus>("idle");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -40,7 +41,7 @@ export default function Contact() {
       if (!res.ok) throw new Error("Request failed");
 
       setStatus("success");
-      setForm({ name: "", email: "", subject: "", message: "" });
+      setForm({ name: "", email: "", subject: "", message: "", website: "" });
     } catch {
       setStatus("error");
     }
@@ -127,6 +128,19 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                {/* Honeypot - hidden from humans, bots fill it, API rejects if non-empty */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                  <label htmlFor="c-website">Website</label>
+                  <input
+                    id="c-website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={field("website")}
+                  />
+                </div>
+
                 {/* Name */}
                 <div>
                   <label htmlFor="c-name" className="block font-heading font-600 text-xs tracking-[0.18em] uppercase text-[#606060] mb-2">

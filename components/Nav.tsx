@@ -3,15 +3,20 @@
 /**
  * Nav
  * Fixed top navigation with smooth anchor links.
+ * On the homepage: smooth-scrolls to the target section.
+ * On other pages: navigates to /#section so the browser lands on the right spot.
  * Collapses to a hamburger menu on mobile.
  * Adds a dark background + border when the user scrolls down.
  */
 
 import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, meta } from "@/data/portfolio";
 
 export default function Nav() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -33,10 +38,13 @@ export default function Nav() {
 
   const handleNavClick = (href: string) => {
     setMobileOpen(false);
-    // Smooth scroll to section
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+    if (pathname === "/") {
+      // Already on homepage - smooth scroll
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // On another page - navigate to homepage then let the hash scroll
+      router.push(`/${href}`);
     }
   };
 
@@ -51,11 +59,15 @@ export default function Nav() {
       <nav className="max-w-6xl mx-auto px-6 h-[72px] flex items-center justify-between">
         {/* Logo / Name */}
         <a
-          href="#"
+          href="/"
           className="font-heading font-bold text-lg tracking-[0.12em] uppercase text-[#f0f0f0] hover:text-[#f5c518] transition-colors duration-200"
           onClick={(e) => {
             e.preventDefault();
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (pathname === "/") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              router.push("/");
+            }
           }}
         >
           {meta.nickname}

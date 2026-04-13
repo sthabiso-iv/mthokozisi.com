@@ -6,11 +6,10 @@
  */
 
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   getPrimaryCategory,
-  getFeaturedImageUrl,
+  getTags,
   stripFeaturedImage,
   formatDate,
   stripHtml,
@@ -25,18 +24,13 @@ interface PostPageProps {
 export default function PostPage({ post }: PostPageProps) {
   if (!post) notFound();
 
-  const category    = getPrimaryCategory(post);
-  const imageUrl    = getFeaturedImageUrl(post);
-  const featuredAlt = post._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ?? post.title.rendered;
-  const plainTitle  = stripHtml(post.title.rendered);
+  const category   = getPrimaryCategory(post);
+  const tags       = getTags(post);
+  const plainTitle = stripHtml(post.title.rendered);
 
-  // Strip the featured image from content — WP sometimes injects it at the
-  // top of content.rendered. We render it deliberately above, OG only.
+  // Strip any featured image WP may have injected into content.rendered
   const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  const cleanContent = stripFeaturedImage(
-    post.content.rendered,
-    rawSourceUrl ?? imageUrl ?? undefined
-  );
+  const cleanContent = stripFeaturedImage(post.content.rendered, rawSourceUrl ?? undefined);
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">
@@ -79,24 +73,28 @@ export default function PostPage({ post }: PostPageProps) {
           <span className="block w-12 h-[3px] bg-[#f5c518]" />
         </header>
 
-        {/* ── Featured image ─────────────────────────────────── */}
-        {imageUrl && (
-          <div className="relative w-full aspect-[16/9] mb-12 overflow-hidden border border-[#242424]">
-            <Image
-              src={imageUrl}
-              alt={featuredAlt}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
-
         {/* ── Post content ───────────────────────────────────── */}
         <div
           className="prose-content"
           dangerouslySetInnerHTML={{ __html: cleanContent }}
         />
+
+        {/* ── Tags ───────────────────────────────────────────── */}
+        {tags.length > 0 && (
+          <div className="mt-10 pt-8 border-t border-[#1c1c1c]">
+            <p className="section-label mb-3">// Tags</p>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="pill text-[0.7rem] cursor-default"
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Share buttons ───────────────────────────────────── */}
         <ShareButtons title={plainTitle} />

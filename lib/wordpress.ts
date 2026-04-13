@@ -101,14 +101,31 @@ export function stripFeaturedImage(content: string, featuredImageUrl?: string): 
 export function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, "")
+    // Named entities
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
     .replace(/&hellip;/g, "…")
     .replace(/&nbsp;/g, " ")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&lsquo;/g, "\u2018")
+    .replace(/&rsquo;/g, "\u2019")
+    .replace(/&ldquo;/g, "\u201C")
+    .replace(/&rdquo;/g, "\u201D")
+    // Decimal numeric entities (e.g. &#8217; &#8220;)
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    // Hex numeric entities (e.g. &#x2019;)
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
     .trim();
+}
+
+/** Get tags from a post's embedded terms */
+export function getTags(post: WPPost): WPTerm[] {
+  const terms = post._embedded?.["wp:term"] ?? [];
+  return terms.flat().filter((t) => t.taxonomy === "post_tag");
 }
 
 /** Get primary category from a post's embedded terms */

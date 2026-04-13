@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * hooks/useCommandPalette.ts
+ * hooks/useCommandPalette.tsx
  *
  * Provides a React context for the command palette open/close state.
  * The global Cmd+K / Ctrl+K keyboard shortcut lives here so it works

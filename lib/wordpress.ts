@@ -152,6 +152,12 @@ export function getFeaturedImageUrl(post: WPPost): string | null {
   );
 }
 
+/** Estimated reading time in minutes (200 wpm) */
+export function getReadingTime(content: string): number {
+  const words = stripHtml(content).trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 /** Format a WP date string for display */
 export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString("en-ZA", {

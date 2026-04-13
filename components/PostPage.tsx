@@ -12,6 +12,7 @@ import {
   getTags,
   stripFeaturedImage,
   formatDate,
+  getReadingTime,
   stripHtml,
   type WPPost,
 } from "@/lib/wordpress";
@@ -24,9 +25,10 @@ interface PostPageProps {
 export default function PostPage({ post }: PostPageProps) {
   if (!post) notFound();
 
-  const category   = getPrimaryCategory(post);
-  const tags       = getTags(post);
-  const plainTitle = stripHtml(post.title.rendered);
+  const category    = getPrimaryCategory(post);
+  const tags        = getTags(post);
+  const plainTitle  = stripHtml(post.title.rendered);
+  const readingTime = getReadingTime(post.content.rendered);
 
   // Strip any featured image WP may have injected into content.rendered
   const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
@@ -62,6 +64,8 @@ export default function PostPage({ post }: PostPageProps) {
               </Link>
             )}
             <span className="text-[#606060] text-xs font-body">{formatDate(post.date)}</span>
+            <span className="text-[#333] text-xs font-body">·</span>
+            <span className="text-[#606060] text-xs font-body">{readingTime} min read</span>
           </div>
 
           <h1

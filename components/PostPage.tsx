@@ -3,9 +3,6 @@
  * Shared post rendering layout used by:
  *   app/posts/[slug]/page.tsx
  *   app/[category]/[slug]/page.tsx
- *
- * Both routes fetch the post differently but render identically.
- * The blog.mthokozisi.com subdomain is never surfaced to the visitor.
  */
 
 import Link from "next/link";
@@ -15,8 +12,10 @@ import {
   getPrimaryCategory,
   getFeaturedImageUrl,
   formatDate,
+  stripHtml,
   type WPPost,
 } from "@/lib/wordpress";
+import ShareButtons from "@/components/ShareButtons";
 
 interface PostPageProps {
   post: WPPost | null;
@@ -25,9 +24,10 @@ interface PostPageProps {
 export default function PostPage({ post }: PostPageProps) {
   if (!post) notFound();
 
-  const category = getPrimaryCategory(post);
-  const imageUrl = getFeaturedImageUrl(post);
+  const category  = getPrimaryCategory(post);
+  const imageUrl  = getFeaturedImageUrl(post);
   const featuredAlt = post._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ?? post.title.rendered;
+  const plainTitle  = stripHtml(post.title.rendered);
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">
@@ -51,13 +51,18 @@ export default function PostPage({ post }: PostPageProps) {
         <header className="mb-10">
           <div className="flex items-center gap-3 mb-5">
             {category && (
-              <span className="pill">{category.name}</span>
+              <Link
+                href={`/posts/${category.slug}`}
+                className="pill hover:bg-[#f5c518]/20 hover:border-[#f5c518]/60 hover:text-[#f5c518] transition-colors duration-150"
+              >
+                {category.name}
+              </Link>
             )}
             <span className="text-[#606060] text-xs font-body">{formatDate(post.date)}</span>
           </div>
 
           <h1
-            className="font-heading font-700 text-[clamp(2rem,5vw,3.25rem)] uppercase leading-tight tracking-wide text-[#f0f0f0] mb-6"
+            className="font-heading font-bold text-[clamp(2rem,5vw,3.25rem)] uppercase leading-tight tracking-wide text-[#f0f0f0] mb-6"
             dangerouslySetInnerHTML={{ __html: post.title.rendered }}
           />
 
@@ -84,8 +89,11 @@ export default function PostPage({ post }: PostPageProps) {
           dangerouslySetInnerHTML={{ __html: post.content.rendered }}
         />
 
+        {/* ── Share buttons ───────────────────────────────────── */}
+        <ShareButtons title={plainTitle} />
+
         {/* ── Footer ─────────────────────────────────────────── */}
-        <footer className="mt-16 pt-8 border-t border-[#1c1c1c] flex items-center justify-between gap-4">
+        <footer className="mt-12 pt-8 border-t border-[#1c1c1c] flex items-center justify-between gap-4">
           <Link
             href="/posts"
             className="inline-flex items-center gap-2 font-heading text-xs tracking-[0.15em] uppercase text-[#606060] hover:text-[#f5c518] transition-colors duration-200"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Rajdhani } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { meta, contact } from "@/data/portfolio";
 import Nav from "@/components/Nav";
@@ -66,6 +67,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   metadataBase: new URL(meta.siteUrl),
   alternates: { canonical: meta.siteUrl },
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 // ── JSON-LD Person schema ─────────────────────────────────────
@@ -114,6 +120,7 @@ export default function RootLayout({
         <Nav />
         {children}
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

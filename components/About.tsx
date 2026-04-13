@@ -2,74 +2,12 @@
 
 /**
  * About
- * Two-column layout: inline SVG avatar placeholder (left) + bio (right).
- * To add a real photo later, replace the <AvatarPlaceholder> with:
- *   <img src="/profile.jpg" alt="Mthokozisi Dhlamini" className="w-full h-full object-cover" />
- * and drop the file in /public/.
+ * Two-column layout: profile photo (left) + bio (right).
  */
 
+import Image from "next/image";
 import AnimatedSection from "@/components/AnimatedSection";
 import { about } from "@/data/portfolio";
-
-// ── Inline SVG avatar — no external image file needed ────────
-function AvatarPlaceholder() {
-  return (
-    <svg
-      viewBox="0 0 280 350"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-label="Mthokozisi Dhlamini - profile photo coming soon"
-      role="img"
-    >
-      {/* Dark background */}
-      <rect width="280" height="350" fill="#1c1c1c" />
-
-      {/* Subtle tactical grid */}
-      <defs>
-        <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-          <path
-            d="M 30 0 L 0 0 0 30"
-            fill="none"
-            stroke="rgba(245,197,24,0.06)"
-            strokeWidth="0.5"
-          />
-        </pattern>
-      </defs>
-      <rect width="280" height="350" fill="url(#grid)" />
-
-      {/* Shoulder / body silhouette */}
-      <ellipse cx="140" cy="390" rx="110" ry="80" fill="#161616" />
-
-      {/* Head circle */}
-      <circle cx="140" cy="148" r="68" fill="#242424" />
-
-      {/* Initials */}
-      <text
-        x="140"
-        y="168"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fontFamily="'Rajdhani', 'Barlow Condensed', sans-serif"
-        fontWeight="700"
-        fontSize="52"
-        letterSpacing="6"
-        fill="#f5c518"
-      >
-        MD
-      </text>
-
-      {/* Subtle yellow ring */}
-      <circle
-        cx="140"
-        cy="148"
-        r="72"
-        fill="none"
-        stroke="rgba(245,197,24,0.15)"
-        strokeWidth="1"
-      />
-    </svg>
-  );
-}
 
 export default function About() {
   return (
@@ -96,7 +34,13 @@ export default function About() {
               {/* Yellow border frame — offset for depth */}
               <div className="absolute -top-3 -left-3 w-full h-full border border-[#f5c518] rounded-sm pointer-events-none" />
               <div className="relative w-full aspect-[4/5] bg-[#1c1c1c] rounded-sm overflow-hidden border border-[#242424]">
-                <AvatarPlaceholder />
+                <Image
+                  src="/profile photo.svg"
+                  alt="Mthokozisi Dhlamini"
+                  fill
+                  className="object-cover object-top"
+                  priority
+                />
               </div>
             </div>
           </AnimatedSection>

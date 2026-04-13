@@ -12,8 +12,8 @@ export const meta = {
   location: "Johannesburg, South Africa",
   description:
     "Cloud & Software Engineer based in Johannesburg. I build mobile apps at The Delta, run UniApplyForMe (an edtech NPO for SA Grade 12s), and operate DesignThat Cloud, a web hosting and design company.",
-  siteUrl: "https://mthokozisi.com",
-  ogImage: "/og-image.png", // Replace with real OG image path
+  siteUrl: "https://www.mthokozisi.com",
+  ogImage: "/og-img.png",
 } as const;
 
 // ── Hero ──────────────────────────────────────────────────────

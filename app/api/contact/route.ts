@@ -1,47 +1,47 @@
 /**
  * POST /api/contact
  *
- * Validates the form, checks honeypot, applies rate limiting,
- * then sends an email via Resend.
+ * On success sends two emails via Resend:
+ *   1. Notification to you with the full message (reply-to set to sender)
+ *   2. Confirmation to the sender with their message quoted back
  *
- * Required env var:
- *   RESEND_API_KEY=re_xxxxxxxxxxxx
+ * Required env vars  (set in .env.local and in Vercel project settings):
+ *   RESEND_API_KEY    - API key from resend.com
+ *   EMAIL_FROM        - verified sender address, e.g. noreply@mthokozisi.com
+ *   EMAIL_FROM_NAME   - display name, e.g. Mthokozisi Dhlamini
+ *   EMAIL_TO          - your inbox, e.g. hello@mthokozisi.com
  *
- * Get a free API key at https://resend.com
- * Verify your domain (mthokozisi.com) in the Resend dashboard so the
- * "from" address resolves properly. Until then you can use
- * onboarding@resend.dev as the from address (only delivers to your
- * verified Resend account email).
- *
- * The "from" and "to" addresses are controlled by the constants below.
+ * Domain verification in Resend is required for a custom from address.
+ * Until then you can set EMAIL_FROM=onboarding@resend.dev (only delivers
+ * to the email address registered with your Resend account).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-// ── Config ────────────────────────────────────────────────────────────
-const TO_EMAIL = "hello@mthokozisi.com";
-// Once mthokozisi.com is verified in Resend, change this to:
-//   "Portfolio <noreply@mthokozisi.com>"
-const FROM_EMAIL = "onboarding@resend.dev";
+// ── Config (driven entirely by env vars) ─────────────────────────────
+function getConfig() {
+  const apiKey   = process.env.RESEND_API_KEY;
+  const fromAddr = process.env.EMAIL_FROM      || "onboarding@resend.dev";
+  const fromName = process.env.EMAIL_FROM_NAME || "Mthokozisi Dhlamini";
+  const toEmail  = process.env.EMAIL_TO        || "hello@mthokozisi.com";
+  const from     = `${fromName} <${fromAddr}>`;
+  return { apiKey, from, toEmail };
+}
 
-// ── Rate limiting (in-memory, resets on cold start) ───────────────────
-// Good enough for a portfolio form; swap for Redis/KV if you need persistence.
+// ── Rate limiting (in-memory; resets on cold start) ───────────────────
 const rateLimit = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 3;      // max submissions
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // per 15 minutes
+const RATE_LIMIT_MAX    = 3;
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
 
 function isRateLimited(ip: string): boolean {
-  const now = Date.now();
+  const now   = Date.now();
   const entry = rateLimit.get(ip);
-
   if (!entry || now > entry.resetAt) {
     rateLimit.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
     return false;
   }
-
   if (entry.count >= RATE_LIMIT_MAX) return true;
-
   entry.count++;
   return false;
 }
@@ -56,7 +56,6 @@ function getClientIp(request: NextRequest): string {
 
 // ── Handler ───────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
-  // Rate limit check
   const ip = getClientIp(request);
   if (isRateLimited(ip)) {
     return NextResponse.json(
@@ -77,35 +76,31 @@ export async function POST(request: NextRequest) {
     email?: string;
     subject?: string;
     message?: string;
-    website?: string; // honeypot - must be empty
+    website?: string;
   };
 
-  // ── Honeypot check (bots fill this, humans don't) ─────────────────
+  // Honeypot
   if (website) {
-    // Silently succeed so bots think it worked
     return NextResponse.json({ success: true }, { status: 200 });
   }
 
-  // ── Validation ────────────────────────────────────────────────────
+  // Validation
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return NextResponse.json(
       { error: "Name, email, and message are required." },
       { status: 400 }
     );
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email.trim())) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
   }
-
-  // Basic length caps to prevent abuse
   if (name.trim().length > 100 || message.trim().length > 5000) {
     return NextResponse.json({ error: "Input too long." }, { status: 400 });
   }
 
-  // ── Send email via Resend ─────────────────────────────────────────
-  if (!process.env.RESEND_API_KEY) {
+  const { apiKey, from, toEmail } = getConfig();
+
+  if (!apiKey) {
     console.error("[contact] RESEND_API_KEY is not set.");
     return NextResponse.json(
       { error: "Email service is not configured. Please contact me directly." },
@@ -113,53 +108,36 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend        = new Resend(apiKey);
+  const safeName      = escapeHtml(name.trim());
+  const safeEmail     = escapeHtml(email.trim());
+  const safeSubject   = subject?.trim() ? escapeHtml(subject.trim()) : "";
+  const safeMessage   = escapeHtml(message.trim());
+  const notifSubject  = safeSubject
+    ? `Portfolio: ${safeSubject}`
+    : `Portfolio contact from ${safeName}`;
 
-  const emailSubject = subject?.trim()
-    ? `Portfolio: ${subject.trim()}`
-    : `Portfolio contact from ${name.trim()}`;
+  // Send both emails concurrently
+  const [notif, confirm] = await Promise.all([
+    // 1. Notification to you
+    resend.emails.send({
+      from,
+      to:      toEmail,
+      replyTo: email.trim(),
+      subject: notifSubject,
+      html:    buildNotificationEmail({ name: safeName, email: safeEmail, subject: safeSubject, message: safeMessage, ip }),
+    }),
+    // 2. Confirmation to sender
+    resend.emails.send({
+      from,
+      to:      email.trim(),
+      subject: `Got your message`,
+      html:    buildConfirmationEmail({ name: safeName, subject: safeSubject, message: safeMessage }),
+    }),
+  ]);
 
-  const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    replyTo: email.trim(),
-    subject: emailSubject,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-        <h2 style="border-bottom:2px solid #f5c518;padding-bottom:8px">
-          New message from mthokozisi.com
-        </h2>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
-          <tr>
-            <td style="padding:8px 0;font-weight:bold;width:80px;color:#555">Name</td>
-            <td style="padding:8px 0">${escapeHtml(name.trim())}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;font-weight:bold;color:#555">Email</td>
-            <td style="padding:8px 0">
-              <a href="mailto:${escapeHtml(email.trim())}" style="color:#f5c518">
-                ${escapeHtml(email.trim())}
-              </a>
-            </td>
-          </tr>
-          ${subject?.trim() ? `
-          <tr>
-            <td style="padding:8px 0;font-weight:bold;color:#555">Subject</td>
-            <td style="padding:8px 0">${escapeHtml(subject.trim())}</td>
-          </tr>` : ""}
-        </table>
-        <div style="background:#f9f9f9;padding:16px;border-left:3px solid #f5c518;white-space:pre-wrap;line-height:1.6">
-${escapeHtml(message.trim())}
-        </div>
-        <p style="margin-top:24px;font-size:12px;color:#999">
-          Sent via mthokozisi.com contact form &middot; IP: ${ip}
-        </p>
-      </div>
-    `,
-  });
-
-  if (error) {
-    console.error("[contact] Resend error:", error);
+  if (notif.error || confirm.error) {
+    console.error("[contact] Resend error:", notif.error ?? confirm.error);
     return NextResponse.json(
       { error: "Failed to send message. Please try again or email me directly." },
       { status: 500 }
@@ -167,6 +145,173 @@ ${escapeHtml(message.trim())}
   }
 
   return NextResponse.json({ success: true }, { status: 200 });
+}
+
+// ── Email templates ───────────────────────────────────────────────────
+// Rajdhani is loaded via Google Fonts @import (works in Gmail web, Apple Mail,
+// iOS Mail). Outlook ignores @import — the sans-serif stack covers it gracefully.
+
+const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap');`;
+
+const HEADING_STYLE =
+  `font-family:'Rajdhani','Barlow Condensed',Impact,sans-serif;` +
+  `font-weight:700;font-size:26px;letter-spacing:0.06em;` +
+  `text-transform:uppercase;color:#f5c518;margin:0;line-height:1.15;`;
+
+const LABEL_STYLE =
+  `font-family:'Rajdhani','Barlow Condensed',Impact,sans-serif;` +
+  `font-weight:700;font-size:11px;letter-spacing:0.2em;` +
+  `text-transform:uppercase;color:#f5c518;margin:0 0 4px;`;
+
+function buildNotificationEmail(p: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  ip: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>${FONT_IMPORT}</style>
+</head>
+<body style="margin:0;padding:0;background:#000000;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:40px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000000;border:1px solid #222222">
+
+        <!-- Top accent bar -->
+        <tr><td style="height:3px;background:#f5c518;padding:0"></td></tr>
+
+        <!-- Header -->
+        <tr><td style="padding:36px 40px 28px">
+          <p style="${LABEL_STYLE}">// New message</p>
+          <h1 style="${HEADING_STYLE}">Portfolio Contact</h1>
+        </td></tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 40px"><div style="height:1px;background:#222222"></div></td></tr>
+
+        <!-- Sender details -->
+        <tr><td style="padding:28px 40px 0">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:10px 0;width:90px;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#666666;vertical-align:top">Name</td>
+              <td style="padding:10px 0;color:#ffffff;font-size:15px">${p.name}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 0;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#666666;vertical-align:top">Email</td>
+              <td style="padding:10px 0">
+                <a href="mailto:${p.email}" style="color:#f5c518;text-decoration:none;font-size:15px">${p.email}</a>
+              </td>
+            </tr>
+            ${p.subject ? `<tr>
+              <td style="padding:10px 0;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#666666;vertical-align:top">Subject</td>
+              <td style="padding:10px 0;color:#ffffff;font-size:15px">${p.subject}</td>
+            </tr>` : ""}
+          </table>
+        </td></tr>
+
+        <!-- Message label -->
+        <tr><td style="padding:24px 40px 0">
+          <p style="${LABEL_STYLE}">// Message</p>
+        </td></tr>
+
+        <!-- Message body -->
+        <tr><td style="padding:12px 40px 0">
+          <div style="background:#0d0d0d;border-left:3px solid #f5c518;padding:20px;color:#ffffff;font-size:15px;line-height:1.7;white-space:pre-wrap;word-break:break-word">${p.message}</div>
+        </td></tr>
+
+        <!-- Reply CTA -->
+        <tr><td style="padding:32px 40px">
+          <a href="mailto:${p.email}" style="display:inline-block;padding:13px 28px;background:#f5c518;color:#000000;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none">
+            Reply to ${p.name}
+          </a>
+        </td></tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 40px"><div style="height:1px;background:#222222"></div></td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:20px 40px">
+          <p style="margin:0;font-size:11px;color:#444444;letter-spacing:0.1em;text-transform:uppercase;font-family:'Rajdhani','Barlow Condensed',sans-serif">
+            mthokozisi.com &middot; IP: ${p.ip}
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function buildConfirmationEmail(p: {
+  name: string;
+  subject: string;
+  message: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>${FONT_IMPORT}</style>
+</head>
+<body style="margin:0;padding:0;background:#000000;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:40px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000000;border:1px solid #222222">
+
+        <!-- Top accent bar -->
+        <tr><td style="height:3px;background:#f5c518;padding:0"></td></tr>
+
+        <!-- Header -->
+        <tr><td style="padding:36px 40px 28px">
+          <p style="${LABEL_STYLE}">// Confirmed</p>
+          <h1 style="${HEADING_STYLE}">Got your message, ${p.name}.</h1>
+        </td></tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 40px"><div style="height:1px;background:#222222"></div></td></tr>
+
+        <!-- Body -->
+        <tr><td style="padding:32px 40px 24px">
+          <p style="margin:0 0 16px;color:#ffffff;font-size:15px;line-height:1.7">
+            Thanks for reaching out. I read every message personally and will get back to you shortly.
+          </p>
+          <p style="margin:0;color:#999999;font-size:15px;line-height:1.7">
+            Here&rsquo;s a copy of what you sent:
+          </p>
+        </td></tr>
+
+        <!-- Their message -->
+        <tr><td style="padding:0 40px 36px">
+          ${p.subject ? `<p style="margin:0 0 12px;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#f5c518">Subject: ${p.subject}</p>` : ""}
+          <div style="background:#0d0d0d;border-left:3px solid #f5c518;padding:20px;color:#ffffff;font-size:15px;line-height:1.7;white-space:pre-wrap;word-break:break-word">${p.message}</div>
+        </td></tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 40px"><div style="height:1px;background:#222222"></div></td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:24px 40px">
+          <p style="margin:0 0 6px;font-family:'Rajdhani','Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;color:#ffffff">
+            Mthokozisi Dhlamini
+          </p>
+          <p style="margin:0 0 6px;font-size:13px;color:#666666">Cloud &amp; Software Engineer</p>
+          <a href="https://www.mthokozisi.com" style="font-size:12px;color:#f5c518;text-decoration:none;letter-spacing:0.05em">
+            www.mthokozisi.com
+          </a>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 }
 
 function escapeHtml(str: string): string {

@@ -45,6 +45,11 @@ const config: Config = {
       backgroundSize: {
         grid: "60px 60px",
       },
+      fontWeight: {
+        "500": "500",
+        "600": "600",
+        "700": "700",
+      },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },

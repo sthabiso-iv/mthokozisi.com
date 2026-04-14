@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
 
   const page    = Math.max(1, parseInt(searchParams.get("page")     ?? "1",  10));
   const perPage = Math.min(100, Math.max(1, parseInt(searchParams.get("per_page") ?? "12", 10)));
-  const catSlug = searchParams.get("cat") ?? undefined;
+  const catSlug = searchParams.get("cat")    ?? undefined;
+  const search  = searchParams.get("search") ?? undefined;
 
   let categoryId: number | undefined;
   if (catSlug) {
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await getPosts({ page, perPage, categoryId });
+    const data = await getPosts({ page, perPage, categoryId, search });
     return NextResponse.json(data, {
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",

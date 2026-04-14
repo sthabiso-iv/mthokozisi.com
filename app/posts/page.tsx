@@ -79,15 +79,7 @@ export default async function PostsPage() {
         {posts.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-[#606060] font-body">
-              Could not load posts right now.{" "}
-              <a
-                href="https://blog.mthokozisi.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#f5c518] underline underline-offset-4"
-              >
-                Visit the blog directly
-              </a>
+              Could not load posts right now. Please check back soon.
             </p>
           </div>
         ) : (

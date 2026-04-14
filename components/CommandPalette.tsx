@@ -179,13 +179,16 @@ function ItemIcon({ type }: { type: ItemType }) {
   }
 }
 
-// ── WP post type (minimal fields) ────────────────────────────────────────────
+// ── WP post type (minimal fields returned by /api/posts) ─────────────────────
 
 interface WPSearchPost {
   id: number;
   slug: string;
   title: { rendered: string };
   excerpt: { rendered: string };
+  _embedded?: {
+    "wp:term"?: Array<Array<{ slug: string; taxonomy: string }>>;
+  };
 }
 
 function stripHtml(html: string) {
@@ -254,22 +257,30 @@ export default function CommandPalette() {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       try {
+        // Route through our own API so the WP auth token stays server-side
         const res = await fetch(
-          `https://blog.mthokozisi.com/wp-json/wp/v2/posts?search=${encodeURIComponent(q)}&per_page=5&_fields=id,slug,title,excerpt`,
+          `/api/posts?search=${encodeURIComponent(q)}&per_page=5`,
           { signal: controller.signal }
         );
         clearTimeout(timeoutId);
 
-        if (!res.ok) throw new Error("WP search failed");
+        if (!res.ok) throw new Error("Post search failed");
 
-        const data: WPSearchPost[] = await res.json();
+        const json = await res.json() as { posts: WPSearchPost[] };
+        const data: WPSearchPost[] = json.posts ?? [];
 
-        const items: SearchItem[] = data.map((p) => ({
-          type: "post",
-          title: stripHtml(p.title.rendered),
-          subtitle: stripHtml(p.excerpt.rendered).replace(/\[...\]/g, "").slice(0, 90).trimEnd() + "…",
-          url: `/posts/${p.slug}`,
-        }));
+        const items: SearchItem[] = data.map((p) => {
+          // Derive canonical URL from category slug if embedded
+          const cats   = p._embedded?.["wp:term"]?.flat().filter((t) => t.taxonomy === "category") ?? [];
+          const catSlug = cats.find((c) => c.slug !== "uncategorized")?.slug ?? cats[0]?.slug;
+          const url    = catSlug ? `/${catSlug}/${p.slug}` : `/posts/${p.slug}`;
+          return {
+            type: "post",
+            title:    stripHtml(p.title.rendered),
+            subtitle: stripHtml(p.excerpt.rendered).replace(/\[...\]/g, "").slice(0, 90).trimEnd() + "…",
+            url,
+          };
+        });
 
         setPostResults(items);
       } catch {

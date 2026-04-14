@@ -231,33 +231,6 @@ body {
   line-height: 1.5;
 }
 
-/* Gallery: each item is a positioned container so the caption overlays */
-.prose-content .wp-block-gallery .wp-block-image {
-  position: relative;
-  overflow: hidden;
-  margin: 0;
-  background: #111;
-}
-.prose-content .wp-block-gallery .wp-block-image figcaption,
-.prose-content .wp-block-gallery .wp-block-image .wp-element-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 1.5rem 0.75rem 0.5rem;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.78));
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.72rem;
-  font-style: normal;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.prose-content .wp-block-gallery .wp-block-image:hover figcaption,
-.prose-content .wp-block-gallery .wp-block-image:hover .wp-element-caption {
-  opacity: 1;
-}
 
 .prose-content hr {
   border: none;
@@ -484,24 +457,61 @@ body {
 /* ── Gallery ────────────────────────────────────────────────── */
 .prose-content .wp-block-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
   margin: 2rem 0;
-  background: #1c1c1c;
 }
-.prose-content .wp-block-gallery .wp-block-image,
-.prose-content .wp-block-gallery figure {
+
+.prose-content .wp-block-gallery .wp-block-image {
   margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 197, 24, 0.12);
+  background: #0d0d0d;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
-.prose-content .wp-block-gallery img {
+
+.prose-content .wp-block-gallery .wp-block-image:hover {
+  border-color: rgba(245, 197, 24, 0.4);
+  transform: scale(1.015);
+}
+
+.prose-content .wp-block-gallery .wp-block-image img {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  display: block;
   border-radius: 0;
   border: none;
   margin: 0;
-  display: block;
-  background: #111;
+}
+
+.prose-content .wp-block-gallery figcaption,
+.prose-content .wp-block-gallery .wp-element-caption {
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 0;
+}
+
+/* WordPress column count overrides */
+.prose-content .wp-block-gallery.columns-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.prose-content .wp-block-gallery.columns-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 640px) {
+  .prose-content .wp-block-gallery,
+  .prose-content .wp-block-gallery.columns-2,
+  .prose-content .wp-block-gallery.columns-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ── Image alignment ────────────────────────────────────────── */

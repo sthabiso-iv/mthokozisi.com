@@ -16,6 +16,8 @@ import {
   stripHtml,
   type WPPost,
 } from "@/lib/wordpress";
+import { rewritePostContent } from "@/lib/rewritePostContent";
+import { PostContent } from "@/components/PostContent";
 import ShareButtons from "@/components/ShareButtons";
 
 interface PostPageProps {
@@ -30,9 +32,12 @@ export default function PostPage({ post }: PostPageProps) {
   const plainTitle  = stripHtml(post.title.rendered);
   const readingTime = getReadingTime(post.content.rendered);
 
-  // Strip any featured image WP may have injected into content.rendered
+  // 1. Strip any featured image WP may have injected into content.rendered
+  // 2. Proxy all blog.mthokozisi.com image URLs through /api/image
   const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  const cleanContent = stripFeaturedImage(post.content.rendered, rawSourceUrl ?? undefined);
+  const safeContent  = rewritePostContent(
+    stripFeaturedImage(post.content.rendered, rawSourceUrl ?? undefined)
+  );
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">
@@ -77,11 +82,8 @@ export default function PostPage({ post }: PostPageProps) {
           <span className="block w-12 h-[3px] bg-[#f5c518]" />
         </header>
 
-        {/* ── Post content ───────────────────────────────────── */}
-        <div
-          className="prose-content"
-          dangerouslySetInnerHTML={{ __html: cleanContent }}
-        />
+        {/* ── Post content + lightbox ────────────────────────── */}
+        <PostContent html={safeContent} />
 
         {/* ── Tags ───────────────────────────────────────────── */}
         {tags.length > 0 && (

@@ -281,12 +281,13 @@ export const contact = {
   email: "hello@mthokozisi.com",
   tagline: "Let's build something. Reach out and I'll get back to you.",
   links: [
-    { label: "LinkedIn", href: "https://linkedin.com/in/sthabiso", display: "linkedin.com/in/sthabiso" },
-    { label: "X / Twitter", href: "https://x.com/Sthabiso_iv", display: "@Sthabiso_iv" },
-    { label: "g.dev/stha", href: "https://g.dev/stha", display: "g.dev/stha" },
-    { label: "Stack Overflow", href: "https://stackoverflow.com/users/15623040/sthabiso-iv", display: "Stack Overflow" },
+    { label: "LinkedIn",     href: "https://linkedin.com/in/sthabiso",                          display: "linkedin.com/in/sthabiso" },
+    { label: "GitHub",       href: "https://github.com/sthabiso-iv",                            display: "github.com/sthabiso-iv"  },
+    { label: "X / Twitter",  href: "https://x.com/Sthabiso_iv",                                display: "@Sthabiso_iv"            },
+    { label: "g.dev/stha",   href: "https://g.dev/stha",                                       display: "g.dev/stha"              },
+    { label: "Stack Overflow", href: "https://stackoverflow.com/users/15623040/sthabiso-iv",   display: "Stack Overflow"          },
     // mthokozisi.link is a link-in-bio / Gravatar hub — all links in one place
-    { label: "Link in bio", href: "https://mthokozisi.link", display: "mthokozisi.link" },
+    { label: "Link in bio",  href: "https://mthokozisi.link",                                  display: "mthokozisi.link"         },
   ],
 } as const;
 

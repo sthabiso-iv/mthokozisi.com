@@ -22,8 +22,9 @@ import {
   getPosts,
   getPrimaryCategory,
 } from "@/lib/wordpress";
-import PostsGrid from "@/components/PostsGrid";
+import { getShortLinks } from "@/lib/blogApi";
 import { meta } from "@/data/portfolio";
+import PostsGrid from "@/components/PostsGrid";
 
 export const revalidate = 300;
 
@@ -149,6 +150,13 @@ export default async function PostsSlugPage({
   }
 
   // Fallback: post has no category — render inline
-  const PostPage = (await import("@/components/PostPage")).default;
-  return <PostPage post={post} />;
+  const [PostPage, shortLinks] = await Promise.all([
+    import("@/components/PostPage").then((m) => m.default),
+    getShortLinks(),
+  ]);
+  const shortSlug = shortLinks[post.id];
+  const shortUrl  = shortSlug
+    ? `${meta.siteUrl}/go/${shortSlug}`
+    : `${meta.siteUrl}/posts/${post.slug}`;
+  return <PostPage post={post} shortUrl={shortUrl} />;
 }

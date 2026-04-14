@@ -17,7 +17,7 @@ import {
   getPrimaryCategory,
   stripHtml,
 } from "@/lib/wordpress";
-import { blogFetch } from "@/lib/blogApi";
+import { blogFetch, getShortLinks } from "@/lib/blogApi";
 import { meta as siteMeta } from "@/data/portfolio";
 import PostPage from "@/components/PostPage";
 
@@ -62,7 +62,7 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>;
 }): Promise<Metadata> {
   const { category, slug } = await params;
-  const post = await getPostBySlug(slug);
+  const [post, shortLinks] = await Promise.all([getPostBySlug(slug), getShortLinks()]);
 
   if (!post) return { title: "Post not found" };
 
@@ -70,6 +70,8 @@ export async function generateMetadata({
   const description  = stripHtml(post.excerpt.rendered).slice(0, 160);
   const imageUrl     = getFeaturedImageUrl(post);
   const canonicalUrl = `${siteMeta.siteUrl}/${category}/${post.slug}`;
+  const shortSlug    = shortLinks[post.id];
+  const shareUrl     = shortSlug ? `${siteMeta.siteUrl}/go/${shortSlug}` : canonicalUrl;
 
   return {
     title,
@@ -78,7 +80,7 @@ export async function generateMetadata({
     openGraph: {
       title:         `${title} | Mthokozisi Dhlamini`,
       description,
-      url:           canonicalUrl,
+      url:           shareUrl,
       type:          "article",
       publishedTime: post.date,
       modifiedTime:  post.modified,
@@ -102,12 +104,17 @@ export default async function CategoryPostPage({
 }: {
   params: Promise<{ category: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const post     = await getPostBySlug(slug);
+  const { slug, category } = await params;
+  const [post, shortLinks] = await Promise.all([getPostBySlug(slug), getShortLinks()]);
 
   if (!post) notFound();
 
+  const shortSlug = shortLinks[post.id];
+  const shortUrl  = shortSlug
+    ? `${siteMeta.siteUrl}/go/${shortSlug}`
+    : `${siteMeta.siteUrl}/${category}/${post.slug}`;
+
   // The category segment is used for canonical SEO only — rendering always
   // uses the actual post data regardless of what category was in the URL.
-  return <PostPage post={post} />;
+  return <PostPage post={post} shortUrl={shortUrl} />;
 }

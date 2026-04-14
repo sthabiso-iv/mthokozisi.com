@@ -2,15 +2,16 @@
 
 /**
  * ShareButtons
- * Share a blog post via X, LinkedIn, Facebook, WhatsApp, and copy-link.
- * Social links use <a target="_blank"> for maximum browser compatibility
- * (avoids popup-blocker interference with window.open).
+ * Renders share links for X, LinkedIn, Facebook, WhatsApp, and copy-link.
+ * Receives the URL to share as a prop (shortUrl) so callers control
+ * which URL is used — no window.location dependency.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface ShareButtonsProps {
-  title: string;
+  shortUrl: string;
+  title:    string;
 }
 
 function XIcon() {
@@ -54,25 +55,18 @@ function LinkIcon() {
   );
 }
 
-export default function ShareButtons({ title }: ShareButtonsProps) {
-  const [copied, setCopied]     = useState(false);
-  const [pageUrl, setPageUrl]   = useState("");
+export default function ShareButtons({ shortUrl, title }: ShareButtonsProps) {
+  const [copied, setCopied] = useState(false);
 
-  // Capture the URL after hydration so it's available for all share links
-  useEffect(() => {
-    setPageUrl(window.location.href);
-  }, []);
-
-  const encodedUrl   = encodeURIComponent(pageUrl);
+  const encodedUrl   = encodeURIComponent(shortUrl);
   const encodedTitle = encodeURIComponent(title);
 
   const handleCopy = async () => {
-    if (!pageUrl) return;
     try {
-      await navigator.clipboard.writeText(pageUrl);
+      await navigator.clipboard.writeText(shortUrl);
     } catch {
       const input = document.createElement("input");
-      input.value = pageUrl;
+      input.value = shortUrl;
       document.body.appendChild(input);
       input.select();
       document.execCommand("copy");
@@ -82,68 +76,51 @@ export default function ShareButtons({ title }: ShareButtonsProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const btnBase =
+  const btn =
     "flex items-center gap-2 px-4 py-2 border border-[#242424] text-[#a0a0a0] font-heading font-bold text-xs tracking-[0.1em] uppercase hover:border-[#f5c518] hover:text-[#f5c518] transition-colors duration-200";
 
   return (
-    <div className="mt-12 pt-8 border-t border-[#1c1c1c]">
-      <p className="section-label mb-4">// Share</p>
-      <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-3">
+      <a
+        href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+        target="_blank" rel="noopener noreferrer"
+        className={btn} aria-label="Share on X"
+      >
+        <XIcon /> X
+      </a>
 
-        <a
-          href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={btnBase}
-          aria-label="Share on X"
-        >
-          <XIcon />
-          X
-        </a>
+      <a
+        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+        target="_blank" rel="noopener noreferrer"
+        className={btn} aria-label="Share on LinkedIn"
+      >
+        <LinkedInIcon /> LinkedIn
+      </a>
 
-        <a
-          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={btnBase}
-          aria-label="Share on LinkedIn"
-        >
-          <LinkedInIcon />
-          LinkedIn
-        </a>
+      <a
+        href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+        target="_blank" rel="noopener noreferrer"
+        className={btn} aria-label="Share on Facebook"
+      >
+        <FacebookIcon /> Facebook
+      </a>
 
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={btnBase}
-          aria-label="Share on Facebook"
-        >
-          <FacebookIcon />
-          Facebook
-        </a>
+      <a
+        href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
+        target="_blank" rel="noopener noreferrer"
+        className={btn} aria-label="Share on WhatsApp"
+      >
+        <WhatsAppIcon /> WhatsApp
+      </a>
 
-        <a
-          href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={btnBase}
-          aria-label="Share on WhatsApp"
-        >
-          <WhatsAppIcon />
-          WhatsApp
-        </a>
-
-        <button
-          onClick={handleCopy}
-          className={`${btnBase} ${copied ? "border-[#f5c518] text-[#f5c518]" : ""}`}
-          aria-label="Copy link"
-        >
-          <LinkIcon />
-          {copied ? "Copied!" : "Copy link"}
-        </button>
-
-      </div>
+      <button
+        onClick={handleCopy}
+        className={`${btn} ${copied ? "border-[#f5c518] text-[#f5c518]" : ""}`}
+        aria-label="Copy link"
+      >
+        <LinkIcon />
+        {copied ? "Copied!" : "Copy link"}
+      </button>
     </div>
   );
 }

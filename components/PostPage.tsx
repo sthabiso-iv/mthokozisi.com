@@ -18,13 +18,13 @@ import {
 } from "@/lib/wordpress";
 import { rewritePostContent } from "@/lib/rewritePostContent";
 import { PostContent } from "@/components/PostContent";
-import ShareButtons from "@/components/ShareButtons";
 
 interface PostPageProps {
-  post: WPPost | null;
+  post:     WPPost | null;
+  shortUrl: string;
 }
 
-export default function PostPage({ post }: PostPageProps) {
+export default function PostPage({ post, shortUrl }: PostPageProps) {
   if (!post) notFound();
 
   const category    = getPrimaryCategory(post);
@@ -82,8 +82,8 @@ export default function PostPage({ post }: PostPageProps) {
           <span className="block w-12 h-[3px] bg-[#f5c518]" />
         </header>
 
-        {/* ── Post content + lightbox ────────────────────────── */}
-        <PostContent html={safeContent} />
+        {/* ── Post content + share bars + lightbox ──────────── */}
+        <PostContent html={safeContent} shortUrl={shortUrl} title={plainTitle} />
 
         {/* ── Tags ───────────────────────────────────────────── */}
         {tags.length > 0 && (
@@ -101,9 +101,6 @@ export default function PostPage({ post }: PostPageProps) {
             </div>
           </div>
         )}
-
-        {/* ── Share buttons ───────────────────────────────────── */}
-        <ShareButtons title={plainTitle} />
 
         {/* ── Footer ─────────────────────────────────────────── */}
         <footer className="mt-12 pt-8 border-t border-[#1c1c1c] flex items-center justify-between gap-4">

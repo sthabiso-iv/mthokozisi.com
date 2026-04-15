@@ -105,7 +105,7 @@ export const projects: Project[] = [
   },
   {
     name: "PUBG Mad Libs",
-    url: "https://pubg-madlibs.vercel.app",
+    url: "https://pubg-madlibs.mthokozisi.com",
     description:
       "A PUBG-themed Mad Libs game built for Re:Coded. Pure HTML, CSS, and JavaScript. No frameworks, no shortcuts. Sometimes the constraints are the point.",
     tags: ["HTML", "CSS", "JavaScript", "Re:Coded"],
@@ -160,7 +160,7 @@ export const experience: ExperienceEntry[] = [
       "Built and scaled the platform from scratch - website, mobile app (Flutter, Android), brand identity, and full server infrastructure",
       "Designed and implemented the UniApplyForMe brand - colours, logo, and visual identity still in use today",
       "Set up and managed dedicated hosting infrastructure: LiteSpeed, CloudLinux, cPanel, AlmaLinux",
-      "Built chatbot automation across WhatsApp, Instagram and Facebook using SendPulse and Twilio",
+      "Built chatbot automation across WhatsApp, Instagram, and Facebook using SendPulse and Twilio",
       "Grew organic traffic through SEO strategy - resulting in R100K+ in AdSense revenue since September 2024",
       "Integrated Google Workspace with WordPress via OIDC for single sign-on across the platform",
     ],

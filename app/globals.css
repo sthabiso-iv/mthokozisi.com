@@ -683,6 +683,45 @@ body {
   clear: both;
 }
 
+/* ── WordPress embeds (YouTube, Vimeo, Twitter, etc.) ───────────────── */
+.prose-content .wp-block-embed {
+  margin: 2rem 0;
+}
+
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper::before {
+  content: "";
+  display: block;
+}
+
+.prose-content .wp-embed-aspect-16-9 .wp-block-embed__wrapper::before { padding-top: 56.25%; }
+.prose-content .wp-embed-aspect-4-3  .wp-block-embed__wrapper::before { padding-top: 75%; }
+.prose-content .wp-embed-aspect-1-1  .wp-block-embed__wrapper::before { padding-top: 100%; }
+.prose-content .wp-embed-aspect-9-16 .wp-block-embed__wrapper::before { padding-top: 177.78%; }
+.prose-content .wp-embed-aspect-21-9 .wp-block-embed__wrapper::before { padding-top: 42.86%; }
+
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper iframe,
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper video,
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper embed,
+.prose-content .wp-has-aspect-ratio .wp-block-embed__wrapper object {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Embeds without aspect ratio (e.g. Twitter/X oEmbed) */
+.prose-content .wp-block-embed__wrapper iframe {
+  max-width: 100%;
+}
+
 /* ── Share bar (above content) ───────────────────────────────────────── */
 .post-share-bar {
   display: flex;

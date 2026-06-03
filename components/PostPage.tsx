@@ -10,7 +10,6 @@ import { notFound } from "next/navigation";
 import {
   getPrimaryCategory,
   getTags,
-  stripFeaturedImage,
   formatDate,
   getReadingTime,
   stripHtml,
@@ -32,12 +31,7 @@ export default function PostPage({ post, shortUrl }: PostPageProps) {
   const plainTitle  = stripHtml(post.title.rendered);
   const readingTime = getReadingTime(post.content.rendered);
 
-  // 1. Strip any featured image WP may have injected into content.rendered
-  // 2. Proxy all blog.mthokozisi.com image URLs through /api/image
-  const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  const safeContent  = rewritePostContent(
-    stripFeaturedImage(post.content.rendered, rawSourceUrl ?? undefined)
-  );
+  const safeContent = rewritePostContent(post.content.rendered);
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">

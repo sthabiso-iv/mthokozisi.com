@@ -69,8 +69,12 @@ export function stripFeaturedImage(content: string, featuredImageUrl?: string): 
 
   if (stem) {
     const escapedStem = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Use a negative lookahead so the match never crosses a </figure> boundary.
+    // Without this, the regex can span from an earlier <figure> (e.g. an embed)
+    // all the way to the featured image's </figure>, removing all content between.
+    const noClose = `(?:(?!<\\/figure>)[\\s\\S])`;
     result = result.replace(
-      new RegExp(`<figure[^>]*>[\\s\\S]*?${escapedStem}[^<]*[\\s\\S]*?</figure>`, "gi"),
+      new RegExp(`<figure[^>]*>${noClose}*?${escapedStem}[^<]*${noClose}*?<\\/figure>`, "gi"),
       ""
     );
     result = result.replace(

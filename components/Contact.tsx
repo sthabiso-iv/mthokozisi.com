@@ -11,6 +11,7 @@
 
 import { useState, type FormEvent } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
+import ObfuscatedEmail from "@/components/ObfuscatedEmail";
 import { contact } from "@/data/portfolio";
 
 interface FormState {
@@ -74,12 +75,9 @@ export default function Contact() {
               {/* Email */}
               <div>
                 <p className="section-label mb-2">Email</p>
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="font-heading font-600 text-xl tracking-wide text-[#f0f0f0] hover:text-[#f5c518] transition-colors duration-200 break-all"
-                >
-                  {contact.email}
-                </a>
+                <ObfuscatedEmail
+                  linkClassName="font-heading font-600 text-xl tracking-wide text-[#f0f0f0] hover:text-[#f5c518] transition-colors duration-200 break-all"
+                />
               </div>
 
               {/* Social links */}
@@ -211,9 +209,7 @@ export default function Contact() {
                 {status === "error" && (
                   <p className="text-red-400 text-sm font-body">
                     Something went wrong. Try emailing me directly at{" "}
-                    <a href={`mailto:${contact.email}`} className="underline hover:text-[#f5c518]">
-                      {contact.email}
-                    </a>
+                    <ObfuscatedEmail linkClassName="underline hover:text-[#f5c518]" />
                   </p>
                 )}
 

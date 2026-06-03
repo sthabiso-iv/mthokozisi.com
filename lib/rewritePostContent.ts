@@ -1,10 +1,12 @@
 /**
  * lib/rewritePostContent.ts
- * Rewrites all blog.mthokozisi.com image URLs in rendered WP HTML to go
- * through the /api/image proxy, so the origin is never visible to visitors.
+ * - Rewrites all blog.mthokozisi.com image URLs to go through /api/image proxy
+ * - Obfuscates email addresses as HTML entities to defeat scrapers
  */
 
-const BLOG_ORIGIN_RE = /https?:\/\/blog\.mthokozisi\.com/gi;
+import { encodeEmailHtml } from "@/lib/obfuscateEmail";
+
+const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
 
 export function rewritePostContent(html: string): string {
   // Rewrite src="https://blog.mthokozisi.com/..."
@@ -30,6 +32,15 @@ export function rewritePostContent(html: string): string {
     /href="(https?:\/\/blog\.mthokozisi\.com\/wp-content[^"]*)"/gi,
     (_, url) => `href="/api/image?url=${encodeURIComponent(url)}"`
   );
+
+  // Obfuscate mailto: href values
+  result = result.replace(
+    /href="mailto:([^"]+)"/gi,
+    (_, email) => `href="mailto:${encodeEmailHtml(email)}"`
+  );
+
+  // Obfuscate any bare email addresses in visible text
+  result = result.replace(EMAIL_RE, (email) => encodeEmailHtml(email));
 
   return result;
 }

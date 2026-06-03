@@ -73,21 +73,19 @@ export function stripFeaturedImage(content: string, featuredImageUrl?: string): 
     // Without this, the regex can span from an earlier <figure> (e.g. an embed)
     // all the way to the featured image's </figure>, removing all content between.
     const noClose = `(?:(?!<\\/figure>)[\\s\\S])`;
-    // No "g" flag — only the first occurrence is removed so an identical
-    // image the author placed explicitly in the body is left untouched.
     result = result.replace(
-      new RegExp(`<figure[^>]*>${noClose}*?${escapedStem}[^<]*${noClose}*?<\\/figure>`, "i"),
+      new RegExp(`<figure[^>]*>${noClose}*?${escapedStem}[^<]*${noClose}*?<\\/figure>`, "gi"),
       ""
     );
     result = result.replace(
-      new RegExp(`<img[^>]*${escapedStem}[^>]*>`, "i"),
+      new RegExp(`<img[^>]*${escapedStem}[^>]*>`, "gi"),
       ""
     );
   }
 
   const escapedUrl = featuredImageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   result = result
-    .replace(new RegExp(`<img[^>]*src=["'][^"']*${escapedUrl}[^"']*["'][^>]*>`, "i"), "")
+    .replace(new RegExp(`<img[^>]*src=["'][^"']*${escapedUrl}[^"']*["'][^>]*>`, "gi"), "")
     .replace(/<figure[^>]*>\s*<\/figure>/gi, "");
 
   return result;

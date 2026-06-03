@@ -39,8 +39,11 @@ export function rewritePostContent(html: string): string {
     (_, email) => `href="mailto:${encodeEmailHtml(email)}"`
   );
 
-  // Obfuscate any bare email addresses in visible text
-  result = result.replace(EMAIL_RE, (email) => encodeEmailHtml(email));
+  // Obfuscate bare emails only in text content (between tags), never inside attributes
+  result = result.replace(/>([^<]+)</g, (_, text) => {
+    const encoded = text.replace(EMAIL_RE, (email: string) => encodeEmailHtml(email));
+    return `>${encoded}<`;
+  });
 
   return result;
 }

@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import {
   getPrimaryCategory,
   getTags,
+  stripFeaturedImage,
   formatDate,
   getReadingTime,
   stripHtml,
@@ -31,7 +32,10 @@ export default function PostPage({ post, shortUrl }: PostPageProps) {
   const plainTitle  = stripHtml(post.title.rendered);
   const readingTime = getReadingTime(post.content.rendered);
 
-  const safeContent = rewritePostContent(post.content.rendered);
+  const rawSourceUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+  const safeContent  = rewritePostContent(
+    stripFeaturedImage(post.content.rendered, rawSourceUrl ?? undefined)
+  );
 
   return (
     <div className="min-h-screen bg-[#0d0d0d]">

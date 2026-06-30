@@ -128,7 +128,7 @@ export const experience: ExperienceEntry[] = [
     company: "The Delta",
     url: "https://thedelta.io",
     role: "Junior Software Engineer",
-    period: "Oct 2024 - Present",
+    period: "Oct 2024 - Jun 2026",
     location: "Johannesburg, South Africa",
     bullets: [
       "Building mobile applications for client ventures using Flutter and FlutterFlow",

@@ -11,7 +11,7 @@ export const meta = {
   title: "Cloud & Software Engineer",
   location: "Johannesburg, South Africa",
   description:
-    "Cloud & Software Engineer based in Johannesburg. I build mobile apps at The Delta, run UniApplyForMe (an edtech NPO for SA Grade 12s), and operate DesignThat Cloud, a web hosting and design company.",
+    "Cloud & Software Engineer based in Johannesburg. I run UniApplyForMe (an edtech NPO for SA Grade 12s) and operate DesignThat Cloud, a web hosting and design company.",
   siteUrl: "https://www.mthokozisi.com",
   ogImage: "/og-img.png",
 } as const;
@@ -31,7 +31,7 @@ export const hero = {
 export const about = {
   bio: [
     "I'm Mthokozisi. Mtho for short. Builder by nature, engineer by training. I've been making things for the web and beyond since long before anyone was paying me for it.",
-    "Right now I'm building mobile apps at The Delta by day, running UniApplyForMe in the evenings (it's an edtech NPO I co-founded to help SA Grade 12 learners navigate university applications, NSFAS, APS scores, and bursaries), and operating DesignThat Cloud, a web hosting and design company that runs on dedicated servers I set up and manage myself.",
+    "I run UniApplyForMe (an edtech NPO I co-founded to help SA Grade 12 learners navigate university applications, NSFAS, APS scores, and bursaries) and operate DesignThat Cloud, a web hosting and design company that runs on dedicated servers I set up and manage myself.",
     "I'm currently studying BSc Computer Science at UNISA (2026-present). Formalising what I've already been doing.",
     "I do my best work alone at 2am, lo-fi on, Sprite in hand.",
   ],
@@ -114,21 +114,23 @@ export const projects: Project[] = [
 
 // ── Experience ────────────────────────────────────────────────
 export interface ExperienceEntry {
-  company: string;
-  url: string;
-  role: string;
-  period: string;
+  company:  string;
+  url:      string;
+  nofollow?: boolean;
+  role:     string;
+  period:   string;
   location: string;
-  bullets: string[];
-  tags: string[];
+  bullets:  string[];
+  tags:     string[];
 }
 
 export const experience: ExperienceEntry[] = [
   {
-    company: "The Delta",
-    url: "https://thedelta.io",
-    role: "Junior Software Engineer",
-    period: "Oct 2024 - Jun 2026",
+    company:  "The Delta",
+    url:      "https://thedelta.io",
+    nofollow: true,
+    role:     "Junior Software Engineer",
+    period:   "Oct 2024 - Jun 2026",
     location: "Johannesburg, South Africa",
     bullets: [
       "Building mobile applications for client ventures using Flutter and FlutterFlow",
@@ -139,9 +141,10 @@ export const experience: ExperienceEntry[] = [
     tags: ["Flutter", "FlutterFlow", "React", "TypeScript", "Supabase"],
   },
   {
-    company: "The Delta",
-    url: "https://thedelta.io",
-    role: "Associate Software Engineer",
+    company:  "The Delta",
+    url:      "https://thedelta.io",
+    nofollow: true,
+    role:     "Associate Software Engineer",
     period: "Jul 2024 - Sep 2024",
     location: "South Africa",
     bullets: [

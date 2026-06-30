@@ -73,7 +73,7 @@ function RoleCard({ entry }: { entry: ExperienceEntry }) {
           <a
             href={entry.url}
             target="_blank"
-            rel="noopener noreferrer"
+            rel={`noopener noreferrer${entry.nofollow ? " nofollow" : ""}`}
             className="font-heading font-bold text-[clamp(1.6rem,3vw,2.25rem)] uppercase tracking-wide text-[#f5c518] hover:text-[#ffd700] transition-colors duration-200 leading-none"
           >
             {entry.company}

@@ -126,6 +126,19 @@ export interface ExperienceEntry {
 
 export const experience: ExperienceEntry[] = [
   {
+    company: "UniApplyForMe",
+    url: "https://apply.org.za",
+    role: "Chairperson of the Board",
+    period: "Dec 2024 - Present",
+    location: "Johannesburg, South Africa",
+    bullets: [
+      "Transitioned from CTO to Chairperson, overseeing strategic direction and partnerships",
+      "Guiding the organisation's long-term vision for education access in South Africa",
+      "Maintaining technical oversight while empowering the team to own day-to-day operations",
+    ],
+    tags: ["Strategy", "EdTech", "Nonprofit"],
+  },
+  {
     company:  "The Delta",
     url:      "https://thedelta.io",
     nofollow: true,
@@ -168,19 +181,6 @@ export const experience: ExperienceEntry[] = [
       "Integrated Google Workspace with WordPress via OIDC for single sign-on across the platform",
     ],
     tags: ["Flutter", "WordPress", "PHP", "n8n", "SendPulse", "Twilio", "Yoast SEO", "Google Cloud", "AWS SES", "Cloudflare"],
-  },
-  {
-    company: "UniApplyForMe",
-    url: "https://apply.org.za",
-    role: "Chairperson of the Board",
-    period: "Dec 2024 - Present",
-    location: "Johannesburg, South Africa",
-    bullets: [
-      "Transitioned from CTO to Chairperson, overseeing strategic direction and partnerships",
-      "Guiding the organisation's long-term vision for education access in South Africa",
-      "Maintaining technical oversight while empowering the team to own day-to-day operations",
-    ],
-    tags: ["Strategy", "EdTech", "Nonprofit"],
   },
   {
     company: "DesignThat Cloud",

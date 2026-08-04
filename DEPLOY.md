@@ -48,13 +48,18 @@ block in `wrangler.toml`.
 
 ```bash
 npm run dev       # Next.js dev server (fast local iteration)
+npm run build     # Build the Cloudflare Worker bundle (opennextjs-cloudflare build)
+npm run build:next  # Plain `next build` (no Cloudflare bundle) — for lint/type checks
 npm run preview   # Build with OpenNext + run the Worker locally (Workers runtime)
 npm run deploy    # Build with OpenNext + deploy to Cloudflare Workers
 npm run cf-typegen  # Regenerate cloudflare-env.d.ts from wrangler.toml
 ```
 
-`npm run preview` is the highest-fidelity local check — it runs the actual
-Worker bundle in `workerd`, the same runtime as production.
+`npm run build` produces the Cloudflare Worker bundle in `.open-next/`
+(it runs `next build` internally, then bundles the Worker + the compiled
+OpenNext config that `wrangler deploy` needs). `npm run preview` is the
+highest-fidelity local check — it runs the actual Worker bundle in `workerd`,
+the same runtime as production.
 
 ## Deploy
 

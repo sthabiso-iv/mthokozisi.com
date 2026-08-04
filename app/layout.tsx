@@ -8,7 +8,7 @@ import { meta, contact } from "@/data/portfolio";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { CommandPaletteProvider } from "@/hooks/useCommandPalette";
-import CommandPalette from "@/components/CommandPalette";
+import CommandPaletteLazy from "@/components/CommandPaletteLazy";
 
 // ── Fonts ─────────────────────────────────────────────────────
 const inter = Inter({
@@ -103,7 +103,7 @@ export default function RootLayout({
           data-dnt="false"
           src="https://alx.designthat.cloud/js/script.js"
           id="ZwSg9rf6GA"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <script
           type="application/ld+json"
@@ -123,7 +123,7 @@ export default function RootLayout({
           <Nav />
           {children}
           <Footer />
-          <CommandPalette />
+          <CommandPaletteLazy />
         </CommandPaletteProvider>
         <Analytics />
       </body>

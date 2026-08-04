@@ -19,7 +19,10 @@ export default function ObfuscatedEmail({ className, linkClassName }: Obfuscated
   }, []);
 
   if (!email) {
-    return <span className={className} aria-label="Email address" />;
+    // Pre-hydration placeholder. No aria-label here: aria-label is not a
+    // permitted attribute on a generic <span> with no role, and the element
+    // is empty and instantly replaced once the email is decoded on mount.
+    return <span className={className} />;
   }
 
   return (

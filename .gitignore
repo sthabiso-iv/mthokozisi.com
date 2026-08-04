@@ -34,6 +34,10 @@ yarn-error.log*
 # Cloudflare / OpenNext build output
 .open-next/
 cloudflare-env.d.ts
+# Cloudflare local dev secrets (Wrangler reads this; keep it out of git)
+.dev.vars
+# Wrangler local state
+.wrangler/
 
 # TypeScript
 *.tsbuildinfo

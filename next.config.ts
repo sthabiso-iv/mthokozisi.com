@@ -10,3 +10,9 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// Enable Cloudflare bindings and `getCloudflareContext()` during `next dev`.
+// This is a no-op in production builds. See:
+// https://opennext.js.org/cloudflare/get-started
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();

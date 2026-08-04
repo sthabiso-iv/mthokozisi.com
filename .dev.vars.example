@@ -1,0 +1,25 @@
+# Local Cloudflare Workers dev vars — copy to `.dev.vars` and fill in.
+#
+#   cp .dev.vars.example .dev.vars
+#
+# `.dev.vars` is read by Wrangler / `npm run preview` (the local Workers
+# runtime). It is git-ignored. For production, set the same keys as secrets:
+#
+#   npx wrangler secret put RESEND_API_KEY
+#
+# (see DEPLOY.md). Values below are placeholders only.
+
+# ── Contact form (Resend) ─────────────────────────────────────────────
+# API key from https://resend.com
+RESEND_API_KEY=
+# Verified sender address. Until your domain is verified in Resend you can
+# use onboarding@resend.dev (only delivers to your Resend account email).
+EMAIL_FROM=onboarding@resend.dev
+EMAIL_FROM_NAME=Mthokozisi Dhlamini
+EMAIL_TO=hello@mthokozisi.com
+
+# ── On-demand revalidation (/api/revalidate?secret=...) ──────────────
+REVALIDATE_SECRET=
+
+# ── WordPress blog API (optional bearer token for protected endpoints) ─
+BLOG_API_TOKEN=

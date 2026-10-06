@@ -564,13 +564,147 @@ body {
   background: #111;
 }
 
-/* ── Audio ──────────────────────────────────────────────────── */
+/* ── Audio — custom player ──────────────────────────────────── */
 .prose-content .wp-block-audio {
   margin: 2rem 0;
 }
+
+/* Native element is hidden; our custom .cap player replaces it */
 .prose-content .wp-block-audio audio {
-  width: 100%;
-  accent-color: #f5c518;
+  display: none !important;
+}
+
+/* Player shell */
+.cap {
+  position: relative;
+  background: #111111;
+  border: 1px solid #242424;
+  padding: 1.1rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* "// AUDIO" label badge on top edge */
+.cap::before {
+  content: "// AUDIO";
+  position: absolute;
+  top: -0.55rem;
+  left: 1rem;
+  font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f5c518;
+  background: #111111;
+  padding: 0 0.35rem;
+}
+
+/* Active state: yellow left border */
+.cap--playing {
+  border-left-color: #f5c518;
+}
+
+/* Top row: button + label + timestamp */
+.cap-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+/* Play / pause button */
+.cap-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(245, 197, 24, 0.3);
+  background: transparent;
+  color: #f5c518;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cap-btn:hover {
+  background: rgba(245, 197, 24, 0.1);
+  border-color: #f5c518;
+}
+.cap-btn:focus-visible {
+  outline: 2px solid #f5c518;
+  outline-offset: 2px;
+}
+
+/* Track title label */
+.cap-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-rajdhani), "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #606060;
+}
+
+/* Timestamp */
+.cap-time {
+  flex-shrink: 0;
+  font-family: "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.75rem;
+  color: #606060;
+  letter-spacing: 0.03em;
+  user-select: none;
+}
+
+/* Progress / seek bar */
+.cap-bar {
+  position: relative;
+  height: 2px;
+  background: #242424;
+  cursor: pointer;
+  border-radius: 0;
+  outline: none;
+}
+.cap-bar::after {
+  /* Larger invisible hit-area */
+  content: "";
+  position: absolute;
+  inset: -6px 0;
+}
+
+/* Filled portion */
+.cap-fill {
+  height: 100%;
+  width: 0%;
+  background: #f5c518;
+  pointer-events: none;
+  transition: width 0.08s linear;
+}
+
+/* Scrubber thumb — visible on hover / focus / playing */
+.cap-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  background: #f5c518;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.cap-bar:hover .cap-thumb,
+.cap-bar:focus-visible .cap-thumb,
+.cap--playing .cap-thumb {
+  opacity: 1;
 }
 
 /* ── File download ──────────────────────────────────────────── */

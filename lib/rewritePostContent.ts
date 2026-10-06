@@ -9,13 +9,23 @@ import { encodeEmailHtml } from "@/lib/obfuscateEmail";
 const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
 
 export function rewritePostContent(html: string): string {
-  // Rewrite src="https://blog.mthokozisi.com/..."
-  let result = html.replace(
+  // ── Step 1: Shield audio/video opening tags ───────────────────
+  // The /api/image proxy buffers the full response with no range-request
+  // support, which breaks audio/video streaming and seeking. Preserve those
+  // src attributes so they point directly at the origin.
+  const mediaTags: string[] = [];
+  let result = html.replace(/<(audio|video)\b[^>]*>/gi, (match) => {
+    const idx = mediaTags.push(match) - 1;
+    return `\x00MEDIA${idx}\x00`;
+  });
+
+  // ── Step 2: Rewrite image src attributes ──────────────────────
+  result = result.replace(
     /src="(https?:\/\/blog\.mthokozisi\.com[^"]*)"/gi,
     (_, url) => `src="/api/image?url=${encodeURIComponent(url)}"`
   );
 
-  // Rewrite srcset="url1 1x, url2 2x, ..."
+  // ── Step 3: Rewrite srcset attributes ────────────────────────
   result = result.replace(
     /srcset="([^"]*)"/gi,
     (_, srcset: string) => {
@@ -27,19 +37,22 @@ export function rewritePostContent(html: string): string {
     }
   );
 
-  // Rewrite href on linked images (e.g. gallery lightbox links WP sometimes adds)
+  // ── Step 4: Rewrite href on WP-content linked images ─────────
   result = result.replace(
     /href="(https?:\/\/blog\.mthokozisi\.com\/wp-content[^"]*)"/gi,
     (_, url) => `href="/api/image?url=${encodeURIComponent(url)}"`
   );
 
-  // Obfuscate mailto: href values
+  // ── Step 5: Restore audio/video tags ─────────────────────────
+  result = result.replace(/\x00MEDIA(\d+)\x00/g, (_, idx) => mediaTags[Number(idx)]);
+
+  // ── Step 6: Obfuscate mailto: href values ────────────────────
   result = result.replace(
     /href="mailto:([^"]+)"/gi,
     (_, email) => `href="mailto:${encodeEmailHtml(email)}"`
   );
 
-  // Obfuscate bare emails only in text content (between tags), never inside attributes
+  // ── Step 7: Obfuscate bare emails in text content ─────────────
   result = result.replace(/>([^<]+)</g, (_, text) => {
     const encoded = text.replace(EMAIL_RE, (email: string) => encodeEmailHtml(email));
     return `>${encoded}<`;

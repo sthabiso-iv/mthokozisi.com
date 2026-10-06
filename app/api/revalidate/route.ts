@@ -12,7 +12,7 @@
  * Set REVALIDATE_SECRET in .env.local and in Vercel environment variables.
  */
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -34,6 +34,9 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Revalidate ───────────────────────────────────────────────
+  // Purge the fetch data cache so re-rendered pages get fresh WP API data.
+  revalidateTag("posts");
+
   const purged: string[] = [];
 
   if (path) {

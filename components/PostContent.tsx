@@ -45,8 +45,10 @@ export function PostContent({ html, shortUrl, title }: PostContentProps) {
       const audio = block.querySelector<HTMLAudioElement>("audio");
       if (!audio) return;
 
-      // Disable native controls + download
+      // Disable native controls, download, and loop
       audio.removeAttribute("controls");
+      audio.removeAttribute("loop");
+      audio.loop = false;
       audio.setAttribute("controlsList", "nodownload noplaybackrate");
       audio.style.cssText = "display:none!important";
 

@@ -167,7 +167,7 @@ export function getPostUrl(post: WPPost): string {
 /** Fetch all non-empty categories */
 export async function getCategories(): Promise<WPTerm[]> {
   try {
-    const res = await blogFetch("/categories?per_page=100&hide_empty=true", { revalidate: 300 });
+    const res = await blogFetch("/categories?per_page=100&hide_empty=true", { revalidate: 300, tags: ["posts"] });
     if (!res.ok) return [];
     const cats = (await res.json()) as WPTerm[];
     return cats
@@ -218,7 +218,7 @@ export async function getPosts(options: {
   if (categoryId) params.set("categories", String(categoryId));
   if (search)     params.set("search",     search);
 
-  const res = await blogFetch(`/posts?${params.toString()}`, { revalidate });
+  const res = await blogFetch(`/posts?${params.toString()}`, { revalidate, tags: ["posts"] });
 
   if (!res.ok) {
     if (res.status === 400) return { posts: [], total: 0, totalPages: 0 };
@@ -248,7 +248,7 @@ export async function getAllPosts(perPage = 12): Promise<WPPost[]> {
 export async function getPostBySlug(slug: string): Promise<WPPost | null> {
   const res = await blogFetch(
     `/posts?slug=${encodeURIComponent(slug)}&_embed`,
-    { revalidate: 300 }
+    { revalidate: 300, tags: ["posts"] }
   );
   if (!res.ok) return null;
   const posts = (await res.json()) as WPPost[];
@@ -258,7 +258,7 @@ export async function getPostBySlug(slug: string): Promise<WPPost | null> {
 /** Fetch all post slugs for generateStaticParams */
 export async function getAllPostSlugs(): Promise<string[]> {
   try {
-    const res = await blogFetch("/posts?per_page=100&_fields=slug", { revalidate: 300 });
+    const res = await blogFetch("/posts?per_page=100&_fields=slug", { revalidate: 300, tags: ["posts"] });
     if (!res.ok) return [];
     const posts = (await res.json()) as Array<{ slug: string }>;
     return posts.map((p) => p.slug);

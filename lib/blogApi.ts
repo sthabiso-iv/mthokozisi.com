@@ -9,11 +9,11 @@ const BLOG_TOKEN      = process.env.BLOG_API_TOKEN ?? "";
 
 export async function blogFetch(
   path: string,
-  options: { revalidate?: number } = {}
+  options: { revalidate?: number; tags?: string[] } = {}
 ) {
   return fetch(`${BLOG_API_BASE}${path}`, {
     headers: { "X-Blog-Token": BLOG_TOKEN },
-    next: { revalidate: options.revalidate ?? 300 },
+    next: { revalidate: options.revalidate ?? 300, tags: options.tags },
   });
 }
 

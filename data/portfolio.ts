@@ -126,10 +126,23 @@ export interface ExperienceEntry {
 
 export const experience: ExperienceEntry[] = [
   {
+    company: "UniApplyForMe Labs",
+    url: "https://labs.org.za",
+    role: "Chief Executive Officer",
+    period: "Nov 2026 - Present",
+    location: "Johannesburg, South Africa",
+    bullets: [
+      "Founded and leading UniApplyForMe Labs, the commercial and innovation arm of the UniApplyForMe ecosystem",
+      "Commercialising education data products, advertising, and technology services built on the UniApplyForMe platform",
+      "Driving revenue strategy, partnerships, and product development to sustain and scale the broader ecosystem",
+    ],
+    tags: ["Strategy", "EdTech", "Data Products", "Commercialisation"],
+  },
+  {
     company: "UniApplyForMe",
     url: "https://apply.org.za",
     role: "Chairperson of the Board",
-    period: "Dec 2024 - Present",
+    period: "Dec 2024 - Nov 2026",
     location: "Johannesburg, South Africa",
     bullets: [
       "Transitioned from CTO to Chairperson, overseeing strategic direction and partnerships",
